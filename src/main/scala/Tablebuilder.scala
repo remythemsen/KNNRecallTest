@@ -23,7 +23,7 @@ object Program extends App {
       "data",                     // Out path
       39290,//20172529,          // N
       10,     //8063              // Queries
-      15,                         // KNN
+      30,                         // KNN
       Euclidean)                  // MEASURE
 
   val data = new RawParser(new File(config.buildFromFile))

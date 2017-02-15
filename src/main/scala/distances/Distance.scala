@@ -62,10 +62,9 @@ object Cosine extends Distance {
   }
 }
 
-object Jaccard {
+object Hamming {
   def measure(x: Array[Int], y:Array[Int]) : Double = {
     ???
   }
-
 }
 

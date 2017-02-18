@@ -28,7 +28,7 @@ object KNN {
       loadedQueries(i) = queries.next
     }
 
-    println("Building Structure")
+    println("Building Structure...")
     var progress = 0.0
     var percentile = data.size / 100
 

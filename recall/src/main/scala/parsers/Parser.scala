@@ -89,6 +89,7 @@ object Parser {
       }
       val numType = config(6)
       val dataSetSize = config(7).toInt
+      val querySetSize = config(8).toInt
 
       // new Testcase
       val tc = dataFormat match {
@@ -99,15 +100,9 @@ object Parser {
               new RawParserDouble(data),
               new RawParserDouble(queries),
               K,
-              dataSetSize)
-          }
-          case "Float" => {
-            new TestCase[(Int, Array[Float])](
-              measure,
-              new RawParserFloat(data),
-              new RawParserFloat(queries),
-              K,
-              dataSetSize)
+              dataSetSize,
+              querySetSize
+            )
           }
         }
         case "reduced" => numType match {
@@ -117,18 +112,38 @@ object Parser {
               new ReducedParserDouble(data),
               new ReducedParserDouble(queries),
               K,
-              dataSetSize)
+              dataSetSize,
+              querySetSize
+            )
           }
-          case "Float" => {
-            new TestCase[(Int, Array[Float])](
-              measure,
-              new ReducedParserFloat(data),
-              new ReducedParserFloat(queries),
-              K,
-              dataSetSize)
-          }
-        }
-      }
+//          case "Float" => {
+//            new TestCase[(Int, Array[Float])](
+//              measure,
+//              new RawParserFloat(data),
+//              new RawParserFloat(queries),
+//              K,
+//              dataSetSize)
+//          }
+//        }
+//        case "reduced" => numType match {
+//          case "Double" => {
+//            new TestCase[(Int, Array[Double])](
+//              measure,
+//              new ReducedParserDouble(data),
+//              new ReducedParserDouble(queries),
+//              K,
+//              dataSetSize)
+//          }
+//          case "Float" => {
+//            new TestCase[(Int, Array[Float])](
+//              measure,
+//              new ReducedParserFloat(data),
+//              new ReducedParserFloat(queries),
+//              K,
+//              dataSetSize)
+//          }
+//
+      }}
       tc
     }
   }

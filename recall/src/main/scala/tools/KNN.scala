@@ -54,6 +54,7 @@ object KNN {
         print("\r" + ((progress / dataSetSize) * 100).toInt + "%")
       }
     }
+    print("\r" + 100.toString + "%\n")
     println("Returning resultset...")
     val resultSets = new ArrayBuffer[(NumericDataPoint[A], Array[(NumericDataPoint[A], Double)])]()
     for(pq <- pqs) {

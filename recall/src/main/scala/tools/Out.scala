@@ -7,7 +7,11 @@ import scala.collection.mutable.ArrayBuffer
 object Out {
 
   def writeToFile(outputFilePath:String, resultSets:ArrayBuffer[(String, String, String, String, String, Double)]) : Unit = {
-    val file = new File(outputFilePath)
+    // Time and Date
+    val now = new java.util.Date
+    val time = new java.text.SimpleDateFormat("yyyy-MM-dd_HH.mm").format(now)
+
+    val file = new File(outputFilePath+"-"+time)
     val bw = new BufferedWriter(new FileWriter(file))
     // System Information
     val sb = new StringBuilder
@@ -38,11 +42,8 @@ object Out {
       // Numeric Type
       sb.append(resultSet._5+" ")
 
-      // Time and Date
-      val now = new java.util.Date
-      sb.append(new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(now)+" ")
       // Recall
-      sb.append("\n"+resultSet._6.toString+" ")
+      sb.append(resultSet._6.toString+" \n")
 
       bw.write(sb.toString)
     }

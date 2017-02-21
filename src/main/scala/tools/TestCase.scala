@@ -2,8 +2,8 @@ package tools
 
 import distances.Distance
 import parsers.Parser
-
-import scala.collection.mutable
+import parsers.Parser.Parser
+import tools.DataPoint.NumericDataPoint
 
 /**
   * A Container representing a single testcase to be run
@@ -11,12 +11,6 @@ import scala.collection.mutable
   * @param data
   */
 
-class TestCase(distance:Distance, numericType:String, data:Parser, queries:Parser, K:Int) { // TODO Extends Runnable
-  def getInfo() = {
-    (data.fileName, queries.fileName, K.toString, distance.getClass.getName, numericType)
-  }
-  def run() : Array[Array[(Int, Double)]] = {
-    // Get all resultsets
-    KNN.search(data, queries, K, distance)
-  }
+class TestCase[A](distance:Distance, data:Parser[NumericDataPoint[A]], queries:Parser[NumericDataPoint[A]], K:Int, dataSetSize:Int) { // TODO Extends Runnable
+  def run = KNN.search(data, queries, K, distance, dataSetSize)
 }

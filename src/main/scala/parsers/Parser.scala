@@ -2,133 +2,134 @@ package parsers
 
 import java.io.File
 
-import distances.{Cosine, Distance, Euclidean}
-import tools.TestCase
+import distances.{Cosine, Euclidean}
+import tools.DataPoint.{DataPoint, NumericDataPoint, doubleDataPoint, floatDataPoint, testCaseDataPoint}
+import tools.{DataPoint, TestCase}
 
-import scala.reflect._
 import scala.io.Source
 
-trait Parser {
-  def next : (Int, Array[Double])
-  var data : Iterator[String] = _
-  var fileName : String = _
-  var size:Int = _
-  def hasNext:Boolean
-
-}
-
-/**
-  * Parses file of format:
-  *
-  * ############ (x49) 00002131
-  * 0.1, 0.2, 3.0(x4096)
-  *
-  * @param input File
-  */
-
-class RawParser[A](input:File) extends Parser {
-  // Get iterator over input file, buffer size: 15000
-  this.data = Source.fromFile(input, 15000).getLines()
-  this.fileName = input.getName
-
-  override def hasNext : Boolean = {
-    data.hasNext
+object Parser {
+  abstract class Parser[A](iterator:Iterator[String]) {
+    def hasNext:Boolean = iterator.hasNext
+    def next : Option[A] = {
+      if(iterator.isEmpty) None
+      else Some(getTuple)
+    }
+    def getTuple:A
   }
   /**
-    * @return tuple2(Id, Vector)
+    * Parses file of format:
+    *
+    * ############ (x49) 00002131
+    * 0.1, 0.2, 3.0, ...
+    *
     */
-  override def next[A]:(Int, Array[A]) = {
-    if(this.data.hasNext) {
-      // The id can be grabbed on place 49 and forward.
-      val id = this.data.next.substring(49).toInt
-      val vec = this.data.next.split(" ")
-      val tvec = for{
-        component <- vec
-      } yield {
-        this match {
-          case _:RawParser[Double] => component.toDouble
-          case _:RawParser[Float] => component.toFloat
-          case _:RawParser[Boolean] => component.toBoolean
-        }
-      }
-
-      (id, tvec.asInstanceOf[Array[A]])
-    } else {
-      throw new Exception("Called next on empty Parser")
+  implicit class RawParserDouble(iterator:Iterator[String]) extends Parser[NumericDataPoint[(Int, Array[Double])]](iterator) {
+    override def getTuple: NumericDataPoint[(Int, Array[Double])] = {
+      new doubleDataPoint(
+        iterator.next.substring(49).toInt, for {
+          comp <- iterator.next.split(" ")
+        } yield comp.toDouble)
     }
   }
-  this.size = Source.fromFile(input).getLines().length / 2
-}
 
-/**
-  * Parses file of format:
-  *
-  *
-  * @param input File
-  */
-class ReducedParser(input:File) extends Parser {
-
-  override def next: (Int, Array[Double]) = ???
-
-  this.size = Source.fromFile(input).getLines().length
-
-  override def hasNext: Boolean = ???
-}
-
-/**
-  * Parses file of format:
-  *
-  * Dataset Queriesset Knnstructure K Measure NumericType
-  *
-  * @param input File
-  */
-class TestCasesParser(input:File) {
-
-  def hasNext : Boolean = {
-    data.hasNext
+  implicit class RawParserFloat(iterator:Iterator[String]) extends Parser[NumericDataPoint[(Int, Array[Float])]](iterator) {
+    override def getTuple: NumericDataPoint[(Int, Array[Float])] = {
+      new floatDataPoint(
+        iterator.next.substring(49).toInt, for {
+          comp <- iterator.next.split(" ")
+        } yield comp.toFloat)
+    }
   }
-  private val data = Source.fromFile(input).getLines()
 
-  def size:Int = Source.fromFile(input).getLines().length
-  def next = {
 
-    if(this.data.hasNext) {
-      val config = this.data.next.split(" ")
-      val measure = config(4)
+  /**
+    * Parses file of format:
+    *
+    * 00002131 0.1, 0.2, 3.0, ...
+    *
+    */
+  implicit class ReducedParserDouble(iterator:Iterator[String]) extends Parser[NumericDataPoint[(Int, Array[Double])]](iterator) {
+    override def getTuple: NumericDataPoint[(Int, Array[Double])] = {
+      new doubleDataPoint({
+        val p = iterator.next.split(" ")
+        (p.head.toInt, p.tail.map(x => x.toDouble))
+      })
+    }
+  }
 
-      config(5) match {
-        case "Double" => {
-          new TestCase(
-            config(4) match {
-              case "Cosine" => { Cosine }
-              case "Euclidean" => { Euclidean }
-            },
-            "Double",
-            new RawParser(new File(config(0))),
-            new RawParser(new File(config(1))),
-            config(3).toInt
-          )
+  implicit class ReducedParserFloat(iterator:Iterator[String]) extends Parser[NumericDataPoint[(Int, Array[Float])]](iterator) {
+    override def getTuple: NumericDataPoint[(Int, Array[Float])] = {
+      new floatDataPoint({
+        val p = iterator.next.split(" ")
+        (p.head.toInt, p.tail.map(x => x.toFloat))
+      })
+    }
+  }
+
+  /**
+    * Parses file of format:
+    *
+    * Dataset Queriesset reduced|raw Knnstructure K Measure NumericType N
+    *
+    * @param iterator Iterator
+    */
+  implicit class TestCasesParser[A](iterator:Iterator[String]) extends Parser[TestCase[A]](iterator) {
+    override def getTuple = ???
+    def getTestCase = {
+      val config = iterator.next.split(" ")
+      val data = Source.fromFile(new File(config(0))).getLines()
+      val queries = Source.fromFile(new File(config(1))).getLines()
+      val dataFormat = config(2)
+      val knnStructDir = config(3)
+      val K = config(4).toInt
+      val measure = config(5) match {
+        case "Cosine" => Cosine
+        case "Euclidean" => Euclidean
+      }
+      val numType = config(6)
+      val dataSetSize = config(7).toInt
+
+      // new Testcase
+      val tc = dataFormat match {
+        case "raw" => numType match {
+          case "Double" => {
+            new TestCase[(Int, Array[Double])](
+              measure,
+              new RawParserDouble(data),
+              new RawParserDouble(queries),
+              K,
+              dataSetSize)
+          }
+          case "Float" => {
+            new TestCase[(Int, Array[Float])](
+              measure,
+              new RawParserFloat(data),
+              new RawParserFloat(queries),
+              K,
+              dataSetSize)
+          }
+        }
+        case "reduced" => numType match {
+          case "Double" => {
+            new TestCase[(Int, Array[Double])](
+              measure,
+              new ReducedParserDouble(data),
+              new ReducedParserDouble(queries),
+              K,
+              dataSetSize)
+          }
+          case "Float" => {
+            new TestCase[(Int, Array[Float])](
+              measure,
+              new ReducedParserFloat(data),
+              new ReducedParserFloat(queries),
+              K,
+              dataSetSize)
+          }
         }
       }
-    } else {
-      throw new Exception("Called next on empty Parser")
+      tc
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

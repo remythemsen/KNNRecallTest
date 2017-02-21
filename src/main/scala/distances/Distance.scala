@@ -62,9 +62,19 @@ object Cosine extends Distance {
   }
 }
 
-object Hamming {
+object Hamming extends Distance {
+  // TODO, instead of int arrays use bits
   def measure(x: Array[Int], y:Array[Int]) : Double = {
-    ???
+    require(x.length == y.length)
+    var c:Int = 0
+    for(i <- x.indices) {
+      if(x(i) != y(i)) c+=1
+    }
+    c.toDouble
   }
+  // TODO, solve this generic problem with primitives
+  override def measure(x: Array[Double], y: Array[Double]): Double = ???
+
+  override def measure(x: Array[Float], y: Array[Float]): Float = ???
 }
 

@@ -12,7 +12,7 @@ object DataPoint {
   }
 
   abstract class NumericDataPoint[A](data:A) extends DataPoint[A](data) {
-    def computeDistance(other:NumericDataPoint[A]):Double
+    def computeDistance(other:NumericDataPoint[A], distance:Distance):Double
     def getId:Int
   }
 
@@ -22,8 +22,8 @@ object DataPoint {
   }
 
   implicit class doubleDataPoint(data:(Int, Array[Double])) extends NumericDataPoint[(Int, Array[Double])](data) {
-    override def computeDistance(other: NumericDataPoint[(Int, Array[Double])]): Double = {
-      Euclidean.measure(data._2, other.get._2)
+    override def computeDistance(other: NumericDataPoint[(Int, Array[Double])], dist:Distance): Double = {
+      dist.measure(data._2, other.get._2)
     }
     override def get: (Int, Array[Double]) = data
     override def equalTo(other: DataPoint[(Int, Array[Double])]): Boolean = {
@@ -35,7 +35,9 @@ object DataPoint {
   }
 
   implicit class floatDataPoint(data:(Int, Array[Float])) extends NumericDataPoint[(Int, Array[Float])](data) {
-    override def computeDistance(other: NumericDataPoint[(Int, Array[Float])]): Double = ???
+    override def computeDistance(other: NumericDataPoint[(Int, Array[Float])], distance:Distance): Double = {
+      distance.measure(data._2, other.get._2)
+    }
     override def get: (Int, Array[Float]) = data
     override def equalTo(other: DataPoint[(Int, Array[Float])]): Boolean = {
       if(other.get._1 == data.get._1) true

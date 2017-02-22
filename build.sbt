@@ -21,3 +21,5 @@ lazy val tools = project in file("tools")
 lazy val reducer = project in file("reducer") dependsOn(tools)
 
 lazy val recall = project in file("recall") dependsOn(tools)
+
+lazy val dataanalyzer = project in file("dataanalyzer") dependsOn(tools)

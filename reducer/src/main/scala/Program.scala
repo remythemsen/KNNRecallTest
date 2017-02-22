@@ -19,34 +19,29 @@ case class Config(data:String, outDir:String)
 object Program extends App {
 implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealingPool(8))
 
-  val queryPoints = Source.fromFile(new File("data/queries-10-ids.data")).getLines
+  val dimensions = args(2).toInt
+  val queryPoints = Source.fromFile(new File(args(1))).getLines
   val qpMap = mutable.HashMap[Int, Boolean]()
   while(queryPoints.hasNext) {
     qpMap+=(queryPoints.next.toInt -> true)
   }
-  val config = new Config("data/descriptors-40000.data", "")
-  println("Generating Random Matrix")
+  val config = new Config(args(0), "")
 
   // TODO Find replacement of random
   val rnd = new Gaussian(0,1)
 
-  // Random Matrix containing values from 0-1 (256 x 4096)
-  val randomMatrix = DimensionalityReducer.getRandMatrix(20000000, 4096, rnd)
-  // val randomMatrix: DenseMatrix[Float] = DimensionalityReducer.getRandMatrix(20000000, 4096);
-  // Matrix of precomputed Vectors to build reduced vectors from (256 x 4096)
+  println("Generating Random Matrix")
 
-
-
-  var n = 0
   val p = 4
   // Number of threads // Same time no matter what number from 4-16
   val loadedTuples = new ArrayBlockingQueue[(Int, Array[Double])](10000)
   val preProcessedTuples = new ArrayBlockingQueue[(Int, Array[Double])](20)
 
   val input = new RawParserDouble(Source.fromFile(new File(config.data)).getLines)
-  n = Source.fromFile(new File(config.data)).getLines.length / 2
+  val originalDimensions = new RawParserDouble(Source.fromFile(new File(config.data)).getLines).getTuple.get._2.length
+  val n = Source.fromFile(new File(config.data)).getLines.length / 2
+  val randomMatrix = DimensionalityReducer.getRandMatrix(dimensions, originalDimensions , rnd)
   var progress = 0
-  println(n)
 
   Future {
     while (input.hasNext) {
@@ -61,7 +56,8 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
     Future {
       while (true) {
         var tuple = loadedTuples.take()
-        val aux = new Array[Double](256)
+        require(tuple._2.length == originalDimensions)
+        val aux = new Array[Double](dimensions)
         DimensionalityReducer.getNewVector(tuple._2, randomMatrix, aux)
         val reducedTuple = (tuple._1, aux)
         preProcessedTuples.put(reducedTuple)
@@ -74,22 +70,23 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
   val dir: String = config.outDir.concat("")
     // constructing filename
     .concat(config.data.substring(0, config.data.length - 5))
-    .concat("-reduced.data")
+    .concat("-reduced-"+dimensions+".data")
 
   val output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dir.toString)))
 
   val qpOutDir = config.outDir.concat("")
     .concat(config.data.substring(0, config.data.length - 5))
-    .concat("-reduced-queries.data")
+    .concat("-reduced-"+dimensions+"-queries.data")
 
   val qpOutPut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(qpOutDir.toString)))
 
   var j = 0.0
+  val percentile = n / 100
 
   while (progress != n) {
 
     var t = preProcessedTuples.take()
-    require(t._2.length == 256)
+    require(t._2.length == dimensions)
 
     var sb = new StringBuffer(456)
     sb.append(t._1)
@@ -109,13 +106,17 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
 
     j += 1.0
     progress += 1
-    if (j % 100 == 0) {
-      print("\r"+((j / n) * 100).toInt.toString + "%")
+    if (j % percentile == 0) {
+      println(((j / n) * 100).toInt + "%")
     }
   }
   output.close()
   qpOutPut.close()
-  println("Finished with "+progress+" out of "+n+" tuples")
+  println("\nFinished with "+progress+" out of "+n+" tuples...")
+  print("Checking dataset...")
+  val newFile = Source.fromFile(new File(dir)).getLines()
+  require(newFile.length == n)
+  print("Ok!\n")
 }
 
 object DimensionalityReducer{
@@ -124,33 +125,27 @@ object DimensionalityReducer{
     MatrixVectorProduct(x,matrix,a)//return Reduced Vector
   }
 
-  def getRandMatrix(n:Int, d:Int, rnd:Gaussian): Array[Array[Double]] ={
-
-    val epsilon=1// 0 <= epsilon <= 1
-    val base2 = scala.math.log(2)
-    val log2N = scala.math.log(n) / base2
-    // m = new reduced dimension
-    val m=((9*epsilon*log2N).toInt) + 38
-
+  def getRandMatrix(targetDimensions:Int, originalDimensions:Int, rnd:Gaussian): Array[Array[Double]] ={
     val randomMatrix = for {
-      i <- (0 until m).toArray
-      b <- Array(new Array[Double](d))
+      i <- (0 until targetDimensions).toArray
+      b <- Array(new Array[Double](originalDimensions))
     } yield b
 
     // Populate bMatrix
-    for (i <- 0 until m) {
-      for (j <- 0 until d) {
+    for (i <- 0 until targetDimensions) {
+      for (j <- 0 until originalDimensions) {
         // dimenstions in each Vector
         randomMatrix(i)(j) = rnd.sample
       }
     }
+    // TODO Why do we need normalizing ?
     val M=normalizeMatrix(randomMatrix)
     M
   }
 
   def MatrixVectorProduct(x:Array[Double],matrix:Array[Array[Double]], a: => Array[Double])={
     // TODO BUild while init'ing
-    for (i <- 0 until 256) {
+    for (i <- 0 until matrix.length) {
       a(i) = Distance.parDotProduct(x, matrix(i))
     }
   }

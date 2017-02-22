@@ -6,7 +6,7 @@ import io.Parser.{Parser, RawParserDouble, TestCasesParser}
 import io.Parser._
 import io._
 import tools.DataPoint.NumericDataPoint
-import tools.{Distance, Euclidean, KNN, TestCase}
+import tools._
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -22,6 +22,7 @@ import scala.io.Source
 
 object Tester extends App {
   // TODO Get input params:
+  // Optimal Setup
   val data = "data/descriptors-40000.data"
   val queries = "data/queries-10.data"
   val K = 30
@@ -37,7 +38,7 @@ object Tester extends App {
   try {
     tknn = loadKNNStructure(knnStructurePath+"knnstructure")
   } catch {
-    case e => {
+    case e:IOException => {
       println(e)
       println("No usable optimal result structure was found!")
       // With side effect of saving the new structure to disk
@@ -61,16 +62,17 @@ object Tester extends App {
     val resultSets = testCase.run
     resultSets.init.head._1
 
+    // Recall is the average over jaccard sim on each q result
 
     var averageRecall = 0.0
     for (resultSet <- resultSets) {
-      val sortedResSet = resultSet._2.sortBy(x => x._2)
+      //val sortedResSet = resultSet._2.sortBy(x => x._2)
       averageRecall += {
         val optimal: Array[(Int, Double)] = this.tknn.get(resultSet._1.get._1).get
-        val optDistSum = optimal.map(x => x._2).sum
-        val resultDistSum = resultSet._2.map(x => x._2).sum
+        val optSet = optimal.map(x => x._1)
+        val retrievedSet = resultSet._2.map(x => x._1.get._1)
 
-        optDistSum / resultDistSum
+        Jaccard.measure(optSet, retrievedSet)
       }
     }
 

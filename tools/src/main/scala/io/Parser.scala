@@ -89,30 +89,35 @@ object Parser {
       val numType = config(6)
       val dataSetSize = config(7).toInt
       val querySetSize = config(8).toInt
+      val dimensions = config(9).toInt
 
       // new Testcase
       val tc = dataFormat match {
         case "raw" => numType match {
           case "Double" => {
             new TestCase[(Int, Array[Double])](
+              config(1),
               measure,
               new RawParserDouble(data),
               new RawParserDouble(queries),
               K,
               dataSetSize,
-              querySetSize
+              querySetSize,
+              dimensions
             )
           }
         }
         case "reduced" => numType match {
           case "Double" => {
             new TestCase[(Int, Array[Double])](
+              config(1),
               measure,
               new ReducedParserDouble(data),
               new ReducedParserDouble(queries),
               K,
               dataSetSize,
-              querySetSize
+              querySetSize,
+              dimensions
             )
           }
 //          case "Float" => {

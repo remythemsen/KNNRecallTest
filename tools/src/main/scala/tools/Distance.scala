@@ -43,7 +43,8 @@ object Cosine extends Distance {
       sum
     }
 
-    dotProduct(x, y)/(magnitude(x)*magnitude(y))
+    1-dotProduct(x, y)
+    //dotProduct(x, y)/(magnitude(x)*magnitude(y))
   }
 
   override def measure(x: Array[Float], y: Array[Float]): Float = {
@@ -82,6 +83,16 @@ object Hamming extends Distance {
   override def measure(x: Array[Double], y: Array[Double]): Double = ???
 
   override def measure(x: Array[Float], y: Array[Float]): Float = ???
+}
+
+object Jaccard extends Distance {
+  override def measure(x: Array[Double], y: Array[Double]): Double = ???
+
+  override def measure(x: Array[Float], y: Array[Float]): Float = ???
+
+  def measure(xs: Array[Int], ys: Array[Int]):Double = {
+    xs.intersect(ys).distinct.size / xs.union(ys).distinct.size.toDouble
+  }
 }
 
 object Distance {

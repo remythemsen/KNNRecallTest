@@ -9,9 +9,9 @@ import tools.DataPoint.NumericDataPoint
   * @param data
   */
 
-class TestCase[A](distance:Distance, data:Parser[NumericDataPoint[A]], queries:Parser[NumericDataPoint[A]], K:Int, dataSetSize:Int, querySetSize:Int) { // TODO Extends Runnable
+class TestCase[A](fileName:String, distance:Distance, data:Parser[NumericDataPoint[A]], queries:Parser[NumericDataPoint[A]], K:Int, dataSetSize:Int, querySetSize:Int, dimensions:Int) { // TODO Extends Runnable
   def getInfo = {
-    (data.getClass.getSimpleName, distance.getClass.getSimpleName, K.toString, dataSetSize.toString, querySetSize.toString)
+    (fileName, data.getClass.getSimpleName, distance.getClass.getSimpleName, K.toString, dataSetSize.toString, querySetSize.toString, dimensions.toString)
   }
   def run = KNN.search(data, queries, K, distance, dataSetSize)
 }

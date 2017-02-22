@@ -35,7 +35,7 @@ object KNN {
         pq <- pqs
       } yield {
         Future {
-          val distFromQ = pq._1.computeDistance(dp.get)
+          val distFromQ = pq._1.computeDistance(dp.get, distance)
           // Update pq if better tuple is found
           if(!pq._1.equalTo(dp.get)) {
             if (pq._2.size < K) {

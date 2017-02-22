@@ -10,6 +10,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
+import scala.util.Random
 
 /**
   * Created by remeeh on 2/21/17.
@@ -41,7 +42,15 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
   val originalDimensions = new RawParserDouble(Source.fromFile(new File(config.data)).getLines).getTuple.get._2.length
   val n = Source.fromFile(new File(config.data)).getLines.length / 2
   val randomMatrix = DimensionalityReducer.getRandMatrix(dimensions, originalDimensions , rnd)
+  val random = new Random(System.currentTimeMillis()) // TODO Better random
   var progress = 0
+
+  val binary = {
+    args(3) match {
+      case "binary" => true
+      case _ => false
+    }
+  } // Whether components should be binary
 
   Future {
     while (input.hasNext) {
@@ -58,7 +67,7 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
         var tuple = loadedTuples.take()
         require(tuple._2.length == originalDimensions)
         val aux = new Array[Double](dimensions)
-        DimensionalityReducer.getNewVector(tuple._2, randomMatrix, aux)
+        DimensionalityReducer.getNewVector(tuple._2, randomMatrix, aux, binary, random.nextLong)
         val reducedTuple = (tuple._1, aux)
         preProcessedTuples.put(reducedTuple)
       }
@@ -67,16 +76,22 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
     }
   }
 
+  val isBinary = {
+    if(binary)
+      "-"+args(3)
+    else ""
+  }
   val dir: String = config.outDir.concat("")
     // constructing filename
     .concat(config.data.substring(0, config.data.length - 5))
-    .concat("-reduced-"+dimensions+".data")
+    .concat("-reduced-"+dimensions+isBinary+".data")
 
   val output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dir.toString)))
 
+
   val qpOutDir = config.outDir.concat("")
     .concat(config.data.substring(0, config.data.length - 5))
-    .concat("-reduced-"+dimensions+"-queries.data")
+    .concat("-reduced-"+dimensions+isBinary+".queries")
 
   val qpOutPut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(qpOutDir.toString)))
 
@@ -92,7 +107,10 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
     sb.append(t._1)
     sb.append(" ")
     for (component <- t._2) {
-      sb.append(component + " ")
+      if(binary)
+        sb.append(component.toInt + " ")
+      else
+        sb.append(component + " ")
     }
     sb.append("\n")
 
@@ -121,8 +139,14 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
 
 object DimensionalityReducer{
 
-  def getNewVector(x:Array[Double], matrix:Array[Array[Double]], a: => Array[Double]) = {
-    MatrixVectorProduct(x,matrix,a)//return Reduced Vector
+
+
+  def getNewVector(x:Array[Double], matrix:Array[Array[Double]], a: => Array[Double], binary:Boolean, seed:Long) = {
+    if(binary) {
+      MatrixVectorProductBit(x,matrix,a, seed)//return Reduced Vector
+    } else {
+      MatrixVectorProduct(x,matrix,a)//return Reduced Vector
+    }
   }
 
   def getRandMatrix(targetDimensions:Int, originalDimensions:Int, rnd:Gaussian): Array[Array[Double]] ={
@@ -147,6 +171,20 @@ object DimensionalityReducer{
     // TODO BUild while init'ing
     for (i <- 0 until matrix.length) {
       a(i) = Distance.parDotProduct(x, matrix(i))
+    }
+  }
+
+  def MatrixVectorProductBit(x:Array[Double],matrix:Array[Array[Double]], a: => Array[Double], rndSeed:Long) = {
+    val rnd = new Random(rndSeed)
+    for(i <- matrix.indices) {
+      a(i) = {
+        val dot = Distance.parDotProduct(x, matrix(i))
+        dot match {
+          case dot if(dot < 0) => 0
+          case dot if(dot > 0) => 1
+          case dot if(dot == 0) => rnd.nextInt(2)
+        }
+      }
     }
   }
 

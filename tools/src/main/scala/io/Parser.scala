@@ -3,7 +3,7 @@ package io
 import java.io.File
 
 import tools.DataPoint.{NumericDataPoint, doubleDataPoint, floatDataPoint}
-import tools.{Cosine, Euclidean, TestCase}
+import tools.{Cosine, Euclidean, Hamming, TestCase}
 
 import scala.io.Source
 
@@ -82,9 +82,10 @@ object Parser {
       val dataFormat = config(2)
       val knnStructDir = config(3)
       val K = config(4).toInt
-      val measure = config(5) match {
-        case "Cosine" => Cosine
-        case "Euclidean" => Euclidean
+      val measure = config(5).toLowerCase match {
+        case "cosine" => Cosine
+        case "euclidean" => Euclidean
+        case "hamming" => Hamming
       }
       val numType = config(6)
       val dataSetSize = config(7).toInt
@@ -96,7 +97,7 @@ object Parser {
         case "raw" => numType match {
           case "Double" => {
             new TestCase[(Int, Array[Double])](
-              config(1),
+              config(0),
               measure,
               new RawParserDouble(data),
               new RawParserDouble(queries),
@@ -110,7 +111,7 @@ object Parser {
         case "reduced" => numType match {
           case "Double" => {
             new TestCase[(Int, Array[Double])](
-              config(1),
+              config(0),
               measure,
               new ReducedParserDouble(data),
               new ReducedParserDouble(queries),

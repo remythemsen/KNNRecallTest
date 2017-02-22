@@ -80,7 +80,14 @@ object Hamming extends Distance {
     c.toDouble
   }
   // TODO, solve this generic problem with primitives
-  override def measure(x: Array[Double], y: Array[Double]): Double = ???
+  override def measure(x: Array[Double], y: Array[Double]): Double = {
+    require(x.length == y.length)
+    var c = 0.0
+    for(i <- x.indices) {
+      if(x(i) != y(i)) c+=1
+    }
+    c.toDouble
+  }
 
   override def measure(x: Array[Float], y: Array[Float]): Float = ???
 }

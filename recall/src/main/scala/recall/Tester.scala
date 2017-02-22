@@ -55,7 +55,7 @@ object Tester extends App {
 
 
   println("Starting Recall Test...")
-  val outPutSets:ArrayBuffer[(String, String, String, String, String, Double)] = new ArrayBuffer()
+  val outPutSets:ArrayBuffer[(String, String, String, String, String, Double, Double, Double)] = new ArrayBuffer()
 
   for(testCase <- testCases) {
     // Progress test 1 out of 4
@@ -64,9 +64,21 @@ object Tester extends App {
 
     // Recall is the average over jaccard sim on each q result
 
+    var avgClosestDist = 0.0
     var averageRecall = 0.0
+    val optimalAvgClosestDist = {
+      var sum = 0.0
+      for(v <- this.tknn.valuesIterator) {
+        //Assuming that they are sorted
+        sum+=v.head._2
+      }
+      sum/this.tknn.valuesIterator.length
+    }
     for (resultSet <- resultSets) {
       //val sortedResSet = resultSet._2.sortBy(x => x._2)
+      avgClosestDist+= {
+        resultSet._2.sortBy(x => x._2).head._2
+      }
       averageRecall += {
         val optimal: Array[(Int, Double)] = this.tknn.get(resultSet._1.get._1).get
         val optSet = optimal.map(x => x._1)
@@ -77,9 +89,10 @@ object Tester extends App {
     }
 
     val result = averageRecall / resultSets.length
+    avgClosestDist/resultSets.length
     val info = testCase.getInfo
 
-    outPutSets += Tuple6(info._1, info._2, info._3, info._4, info._5, result)
+    outPutSets += Tuple8(info._1, info._2, info._3, info._4, info._5, result, optimalAvgClosestDist, avgClosestDist)
 
     // Output class
     Out.writeToFile(outPath, outPutSets)

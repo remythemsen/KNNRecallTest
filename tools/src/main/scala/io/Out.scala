@@ -6,7 +6,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object Out {
 
-  def writeToFile(outputFilePath:String, resultSets:ArrayBuffer[(String, String, String, String, String, Double)]) : Unit = {
+  def writeToFile(outputFilePath:String, resultSets:ArrayBuffer[(String, String, String, String, String, Double, Double, Double)]) : Unit = {
     // Time and Date
     val now = new java.util.Date
     val time = new java.text.SimpleDateFormat("yyyy-MM-dd_HH.mm").format(now)
@@ -27,6 +27,9 @@ object Out {
     sb.append(Runtime.getRuntime().availableProcessors()+"\n")
     sb.append("\n")
 
+    sb.append("Optimal Average Closest Point Distance from Queries: "+resultSets.head._7.toString+"\n")
+
+
     bw.write(sb.toString)
 
     for(resultSet <- resultSets) {
@@ -43,7 +46,10 @@ object Out {
       sb.append(resultSet._5+" ")
 
       // Recall
-      sb.append(resultSet._6.toString+" \n")
+      sb.append(resultSet._6.toString+" ")
+
+      // Avg Closest Point distance found from queries
+      sb.append(resultSet._8.toString+"\n")
 
       bw.write(sb.toString)
     }

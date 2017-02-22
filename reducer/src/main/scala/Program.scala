@@ -103,14 +103,14 @@ implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealing
     output.write(sb.toString())
 
     // if point is a querypoint, then also write to querypoint file
-    if(qpMap.get(t._1).head)
+    if(qpMap.contains(t._1))
       qpOutPut.write(sb.toString())
 
 
     j += 1.0
     progress += 1
     if (j % 100 == 0) {
-      println("\r"+((j / n) * 100).toInt.toString + "%")
+      print("\r"+((j / n) * 100).toInt.toString + "%")
     }
   }
   output.close()

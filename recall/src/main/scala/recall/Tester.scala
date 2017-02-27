@@ -23,11 +23,11 @@ import scala.io.Source
 object Tester extends App {
   // TODO Get input params:
   // Optimal Setup
-  val data = "data/descriptors-40000.data"
-  val queries = "data/queries-10.data"
+  val data = "data/descriptors-1-million.data"
+  val queries = "data/queries-1m-raw.data"
   val K = 30
   val measure = Euclidean
-  val N = Source.fromFile(new File(data)).getLines().length / 2
+  val N = 1008263
   val knnStructurePath = "data/"
   val testCasesPath = "data/testcases"
   val outPath = "out/results.data"
@@ -42,7 +42,7 @@ object Tester extends App {
       println(e)
       println("No usable optimal result structure was found!")
       // With side effect of saving the new structure to disk
-      tknn = buildKNNStructure(knnStructurePath, new RawParserDouble(Source.fromFile(new File(data)).getLines()), new RawParserDouble(Source.fromFile(new File(queries)).getLines()), K, measure, N )
+      tknn = buildKNNStructure(knnStructurePath, new RawParserDouble(Source.fromFile(new File(data)).getLines()), new ReducedParserDouble(Source.fromFile(new File(queries)).getLines()), K, measure, N )
     }
   }
 
@@ -110,7 +110,7 @@ object Tester extends App {
     hashMap
   }
 
-  def buildKNNStructure(path:String, optData:RawParserDouble, queries:RawParserDouble, K:Int, measure:Distance, N:Int):mutable.HashMap[Int, Array[(Int, Double)]] = {
+  def buildKNNStructure(path:String, optData:RawParserDouble, queries:ReducedParserDouble, K:Int, measure:Distance, N:Int):mutable.HashMap[Int, Array[(Int, Double)]] = {
     type NumericTuple = NumericDataPoint[(Int, Double)]
     val structure = new mutable.HashMap[Int, Array[(Int, Double)]]
     val resultSets = KNN.search(optData, queries, K, measure, N)

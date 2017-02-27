@@ -52,10 +52,10 @@ object KNN {
 
       progress += 1
       if (progress % percentile == 0) {
-        print("\r" + ((progress / dataSetSize) * 100).toInt + "%")
+        println(((progress / dataSetSize) * 100).toInt + "%")
       }
     }
-    print("\r" + 100.toString + "%\n")
+    println("\r" + 100.toString + "%\n")
     println("Returning resultset...")
     val resultSets = new ArrayBuffer[(NumericDataPoint[A], Array[(NumericDataPoint[A], Double)])]()
     for(pq <- pqs) {

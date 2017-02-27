@@ -43,8 +43,8 @@ object Cosine extends Distance {
       sum
     }
 
-    1-dotProduct(x, y)
-    //dotProduct(x, y)/(magnitude(x)*magnitude(y))
+    //1- to convert to similarty measure
+    1-dotProduct(x, y)/(magnitude(x)*magnitude(y))
   }
 
   override def measure(x: Array[Float], y: Array[Float]): Float = {

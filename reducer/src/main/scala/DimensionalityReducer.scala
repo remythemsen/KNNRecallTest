@@ -11,13 +11,18 @@ import scala.util.Random
   */
 object DimensionalityReducer{
 
-
-
-  def getNewVector(x:Array[Double], matrix:Array[Array[Double]], a: => Array[Double], binary:Boolean, seed:Long) = {
+  def getNewVector(x:Array[Double], matrix:Array[Array[Double]], a: => Array[Double], binary:Boolean, seed:Long, targetDim:Int) = {
     if(binary) {
       MatrixVectorProductBit(x,matrix,a, seed)//return Reduced Vector
     } else {
-      MatrixVectorProduct(x,matrix,a)//return Reduced Vector
+      MatrixVectorProduct(x, matrix, a)
+      scaleToTargetDimension(a, sqrt(targetDim.toDouble))//return Reduced Vector
+    }
+  }
+
+  def scaleToTargetDimension(a: => Array[Double], sqrtTargetDim:Double) = {
+    for(i <- a.indices) {
+      a(i) = a(i)/sqrtTargetDim
     }
   }
 
@@ -34,10 +39,10 @@ object DimensionalityReducer{
         randomMatrix(i)(j) = rnd.sample
       }
     }
-    // TODO Why do we need normalizing ?
-    val M=normalizeMatrix(randomMatrix)
-    M
+    //val M=normalizeMatrix(randomMatrix)
+    randomMatrix
   }
+
 
   def MatrixVectorProduct(x:Array[Double],matrix:Array[Array[Double]], a: => Array[Double])={
     // TODO BUild while init'ing
@@ -58,33 +63,5 @@ object DimensionalityReducer{
         }
       }
     }
-  }
-
-  def normalizeMatrix(A:Array[Array[Double]]):Array[Array[Double]]={
-    val buffer= new ArrayBuffer[Double]
-
-    val B = for {
-      i <- (0 until A.length).toArray
-      b <- Array(new Array[Double](A(0).length))
-    } yield b
-
-    // Populate bMatrix
-    for (i <- 0 until A.length) {
-      for (j <- 0 until A(0).length) {
-        // dimenstions in each Vector
-        B(i)(j) = 0.0
-      }
-    }
-    for(i<-0 until A.length){
-      val b = new ArrayBuffer[Double]
-      for(j<-0 until A(0).length){
-        b+=A(i)(j) // Note this conversion
-      }
-      val l= sqrt(b.map { case (x) => pow(x, 2) }.sum)
-      for(c <-0 until A(0).length){
-        B(i)(c) = (b(c)/l)
-      }
-    }
-    B
   }
 }

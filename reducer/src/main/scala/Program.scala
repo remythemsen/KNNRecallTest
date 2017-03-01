@@ -63,12 +63,12 @@ object Program extends App {
       val dimensions = config.targetDim
       val queryPoints = Source.fromFile(config.queryPoints).getLines
       val qpMap = mutable.HashMap[Int, Boolean]()
-      while(queryPoints.hasNext) {
-        qpMap+=(queryPoints.next.toInt -> true)
+      while (queryPoints.hasNext) {
+        qpMap += (queryPoints.next.toInt -> true)
       }
 
       // TODO Find replacement of random
-      val rnd = new Gaussian(0,1)
+      val rnd = new Gaussian(0, 1)
 
 
       val p = 4
@@ -83,7 +83,7 @@ object Program extends App {
 
       println("Generating Random Matrix...")
 
-      val randomMatrix = DimensionalityReducer.getRandMatrix(dimensions, originalDimensions , rnd)
+      val randomMatrix = DimensionalityReducer.getRandMatrix(dimensions, originalDimensions, rnd)
       val random = new Random(config.randomSeed) // TODO Better random
 
       val binary = config.binary
@@ -106,7 +106,7 @@ object Program extends App {
             var tuple = loadedTuples.take()
             require(tuple._2.length == originalDimensions)
             val aux = new Array[Double](dimensions)
-            DimensionalityReducer.getNewVector(tuple._2, randomMatrix, aux, binary, random.nextLong)
+            DimensionalityReducer.getNewVector(tuple._2, randomMatrix, aux, binary, random.nextLong, dimensions)
             val reducedTuple = (tuple._1, aux)
             preProcessedTuples.put(reducedTuple)
           }
@@ -116,21 +116,21 @@ object Program extends App {
       }
 
       val isBinary = {
-        if(binary)
-          "-"+config.binary
+        if (binary)
+          "-" + config.binary
         else ""
       }
       val dir: String = config.outDir.concat("/")
         // constructing filename
         .concat(config.data.getName.substring(0, config.data.getName.length - 5))
-        .concat("-reduced-"+dimensions+isBinary+".data")
+        .concat("-reduced-" + dimensions + isBinary + ".data")
 
       val output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dir.toString)))
 
 
       val qpOutDir = config.outDir.concat("/")
         .concat(config.data.getName.substring(0, config.data.getName.length - 5))
-        .concat("-reduced-"+dimensions+isBinary+".queries")
+        .concat("-reduced-" + dimensions + isBinary + ".queries")
 
       val qpOutPut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(qpOutDir.toString)))
 
@@ -146,7 +146,7 @@ object Program extends App {
         sb.append(t._1)
         sb.append(" ")
         for (component <- t._2) {
-          if(binary)
+          if (binary)
             sb.append(component.toInt + " ")
           else
             sb.append(component + " ")
@@ -157,7 +157,7 @@ object Program extends App {
         output.write(sb.toString())
 
         // if point is a querypoint, then also write to querypoint file
-        if(qpMap.contains(t._1))
+        if (qpMap.contains(t._1))
           qpOutPut.write(sb.toString())
 
 
@@ -169,14 +169,13 @@ object Program extends App {
       }
       output.close()
       qpOutPut.close()
-      println("\nFinished with "+progress+" out of "+n+" tuples...")
+      println("\nFinished with " + progress + " out of " + n + " tuples...")
       print("Checking dataset...")
       val newFile = Source.fromFile(new File(dir)).getLines()
       require(newFile.length == n)
       print("Ok!\n")
 
     }
-    case None => "Error"
   }
 }
 

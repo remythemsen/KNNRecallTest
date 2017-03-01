@@ -1,5 +1,5 @@
 import org.scalatest.{FlatSpec, Matchers}
-import tools.{Cosine, Euclidean, Hamming}
+import tools.{Cosine, Euclidean, Hamming, Jaccard}
 
 import scala.math.BigDecimal
 
@@ -39,5 +39,16 @@ class DistanceSpec extends FlatSpec with Matchers {
   "Cosine measure" should "get correct results" in {
     BigDecimal(Cosine.measure(Array(1.2,2.0,1.9), Array(1.2,0.1,0.9))).setScale(6, BigDecimal.RoundingMode.HALF_UP).toDouble should be (0.259259)
     BigDecimal(Cosine.measure(Array(1.2,99,1.9,1.0), Array(1.2,0.1,0.9,-10))).setScale(6, BigDecimal.RoundingMode.HALF_UP).toDouble should be (0.996954)
+    BigDecimal(Cosine.measure(Array(1.0, -1.0), Array(-1.0, 1.0))).setScale(6, BigDecimal.RoundingMode.HALF_UP).toDouble should be (2)
+  }
+  // Jaccard
+  "Jaccard measure" should "get 0.0 on identical sets" in {
+    Jaccard.measure(Array(123, 321), Array(123, 321)) should be (1)
+    Jaccard.measure(Array(321, 123), Array(123, 321)) should be (1)
+  }
+  "Jaccard measure" should "get correct results" in {
+    Jaccard.measure(Array(123, 321), Array(321, 321)) should be (0.5)
+    Jaccard.measure(Array(123, 432), Array(321, 321)) should be (0.0)
+    BigDecimal(Jaccard.measure(Array(1, 0), Array(2, 1))).setScale(6, BigDecimal.RoundingMode.HALF_UP).toDouble should be (0.333333)
   }
 }

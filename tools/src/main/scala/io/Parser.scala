@@ -100,7 +100,7 @@ object Parser {
               config(0),
               measure,
               new RawParserDouble(data),
-              new RawParserDouble(queries),
+              new ReducedParserDouble(queries),
               K,
               dataSetSize,
               querySetSize,

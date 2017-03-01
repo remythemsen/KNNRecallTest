@@ -1,12 +1,12 @@
 import java.io.{BufferedWriter, File, FileWriter}
 
-import io.Parser.RawParserDouble
+import io.Parser.{RawParserDouble, ReducedParserDouble}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 object Program extends App {
-  val n = Source.fromFile(new File(args(0))).getLines().length / 2
+  val n = 1008263
   val data = new RawParserDouble(Source.fromFile(new File(args(0))).getLines()) // Data file
   val outDir = args(1)
   val dimensions = 4096

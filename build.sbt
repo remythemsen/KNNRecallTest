@@ -7,6 +7,7 @@ scalaVersion := "2.11.8"
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies ++= Seq(
+  "com.github.scopt" %% "scopt" % "3.5.0",
   "org.scalanlp" %% "breeze" % "0.12",
   "org.scalanlp" %% "breeze-natives" % "0.12",
   "org.scalanlp" %% "breeze-viz" % "0.12",
@@ -14,7 +15,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
 
-lazy val KNNRecallTest = project in file(".")
+lazy val KNNRecallTest = project in file(".") dependsOn(tools)
 
 lazy val tools = project in file("tools")
 

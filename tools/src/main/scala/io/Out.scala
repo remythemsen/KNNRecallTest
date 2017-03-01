@@ -24,10 +24,10 @@ object Out {
     sb.append(System.getProperty("java.version")+"\n")
     sb.append("CPU: ")
     sb.append(System.getenv("PROCESSOR_IDENTIFIER")+", ")
-    sb.append(Runtime.getRuntime().availableProcessors()+"\n")
+    sb.append("Cores: "+Runtime.getRuntime().availableProcessors()+"\n")
     sb.append("\n")
 
-    sb.append("Optimal Average Closest Point Distance from Queries: "+resultSets.head._7.toString+"\n")
+    //sb.append("Optimal Average Closest Point Distance from Queries: "+resultSets.head._7.toString+"\n")
 
 
     bw.write(sb.toString)
@@ -46,10 +46,10 @@ object Out {
       sb.append(resultSet._5+" ")
 
       // Recall
-      sb.append(resultSet._6.toString+" ")
+      sb.append(resultSet._6.toString+"\n")
 
       // Avg Closest Point distance found from queries
-      sb.append(resultSet._8.toString+"\n")
+      //sb.append(resultSet._8.toString+"\n")
 
       bw.write(sb.toString)
     }

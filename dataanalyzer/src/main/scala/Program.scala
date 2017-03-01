@@ -32,7 +32,7 @@ object Program extends App {
 
   while(data.hasNext) {
     val tuple = data.next.head.get
-    val vSum = tuple._2.sum
+    val vSum = Math.sqrt(tuple._2.map(x => Math.pow(x, 2)).sum)
     vSums += vSum
     if(vSum < minVectorLength) {
       minVectorLength = vSum
@@ -90,7 +90,7 @@ object Program extends App {
   sb.append(System.getProperty("java.version")+"\n")
   sb.append("CPU: ")
   sb.append(System.getenv("PROCESSOR_IDENTIFIER")+", ")
-  sb.append(Runtime.getRuntime().availableProcessors()+"\n")
+  sb.append("Cores: "+Runtime.getRuntime().availableProcessors()+"\n")
   sb.append("\n")
 
   sb.append("File: \n")

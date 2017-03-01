@@ -139,10 +139,12 @@ object Tester extends App {
         }
 
         val result = averageRecall / resultSets.length
-        avgClosestDist / resultSets.length
+        avgClosestDist = avgClosestDist / resultSets.length
         val info = testCase.getInfo
 
         outPutSets += Tuple8(info._1, info._2, info._3, info._4, info._5, result, optimalAvgClosestDist, avgClosestDist)
+        avgClosestDist = 0
+
       }
       Out.writeToFile(outPath, outPutSets)
       println("Test Finished.")

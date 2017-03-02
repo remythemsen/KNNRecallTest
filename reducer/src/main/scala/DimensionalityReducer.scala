@@ -11,12 +11,12 @@ import scala.util.Random
   */
 object DimensionalityReducer{
 
-  def getNewVector(x:Array[Double], matrix:Array[Array[Double]], a: => Array[Double], binary:Boolean, seed:Long, targetDim:Int) = {
+  def getNewVector(x:Array[Double], matrix:Array[Array[Double]], a: => Array[Double], binary:Boolean, seed:Long, sqrtTargetDim:Double) = {
     if(binary) {
       MatrixVectorProductBit(x,matrix,a, seed)//return Reduced Vector
     } else {
       MatrixVectorProduct(x, matrix, a)
-      scaleToTargetDimension(a, sqrt(targetDim.toDouble))//return Reduced Vector
+      scaleToTargetDimension(a, sqrtTargetDim)//return Reduced Vector
     }
   }
 

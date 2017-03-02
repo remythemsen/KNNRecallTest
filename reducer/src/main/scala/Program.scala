@@ -61,6 +61,7 @@ object Program extends App {
       implicit val ec = ExecutionContext.fromExecutorService(Executors.newWorkStealingPool(8))
 
       val dimensions = config.targetDim
+      val sqrtTargetDim = Math.sqrt(dimensions.toDouble)
       val queryPoints = Source.fromFile(config.queryPoints).getLines
       val qpMap = mutable.HashMap[Int, Boolean]()
       while (queryPoints.hasNext) {
@@ -106,7 +107,7 @@ object Program extends App {
             var tuple = loadedTuples.take()
             require(tuple._2.length == originalDimensions)
             val aux = new Array[Double](dimensions)
-            DimensionalityReducer.getNewVector(tuple._2, randomMatrix, aux, binary, random.nextLong, dimensions)
+            DimensionalityReducer.getNewVector(tuple._2, randomMatrix, aux, binary, random.nextLong, sqrtTargetDim)
             val reducedTuple = (tuple._1, aux)
             preProcessedTuples.put(reducedTuple)
           }

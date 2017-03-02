@@ -78,7 +78,6 @@ object Tester extends App {
         case "euclidean" => Euclidean
         case "cosine" => Cosine
         case "hamming" => Hamming
-        case "jaccard" => Jaccard
       }
       val N = config.n
       val outPath = config.outDir + "/results.txt"

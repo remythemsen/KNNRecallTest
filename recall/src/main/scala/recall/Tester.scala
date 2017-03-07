@@ -104,12 +104,23 @@ object Tester extends App {
 
 
       println("Starting Recall Test...")
+      val htmlGen = new HTMLGenerator(new StringBuilder)
       val outPutSets: ArrayBuffer[(String, String, String, String, String, Double, Double, Double)] = new ArrayBuffer()
+
+      // Optimal resutls to be printed
+      val pResults:ArrayBuffer[(Int, Array[(Int,Double)])] = new ArrayBuffer[(Int, Array[(Int,Double)])]()
+      for (v <- this.tknn.iterator) {
+        pResults += Tuple2(v._1,v._2)
+      }
+
+      // Adding optimal res html section
+      htmlGen.addSection(Tuple2("Optimal: (Euclidean, 4096 dimensions)", pResults))
+
+
 
       for (testCase <- testCases) {
         // Progress test 1 out of 4
         val resultSets = testCase.run
-        resultSets.init.head._1
 
         // Recall is the average over jaccard sim on each q result
 
@@ -123,8 +134,21 @@ object Tester extends App {
           }
           sum / this.tknn.valuesIterator.length
         }
-        for (resultSet <- resultSets) {
-          //val sortedResSet = resultSet._2.sortBy(x => x._2)
+
+        val tcInfo = testCase.getInfo._4.toLowerCase + " " + testCase.getInfo._1 + " " + testCase.getInfo._5
+
+        val testCaseHtmlOutSection:(String, ArrayBuffer[(Int, Array[(Int,Double)])]) = (tcInfo, new ArrayBuffer[(Int, Array[(Int,Double)])]())
+
+        for (resultSet <- resultSets) { // Resultset represents a query to KNN, (that query's closest points)
+          // Insert set into resultset to be printed in html
+
+          val qp = resultSet._1.get._1
+          val sortedResSets = resultSet._2.sortBy(x => x._2)    //.map(y => y._1).map(z => z.get)
+          val closestTuples = sortedResSets.map(x => x._1.get._1).zip(sortedResSets.map(y => y._2))
+
+
+          testCaseHtmlOutSection._2 += Tuple2(qp, closestTuples)
+
           avgClosestDist += {
             resultSet._2.sortBy(x => x._2).head._2
           }
@@ -137,6 +161,9 @@ object Tester extends App {
           }
         }
 
+        // Print to HTML
+        htmlGen.addSection(testCaseHtmlOutSection)
+
         val result = averageRecall / resultSets.length
         avgClosestDist = avgClosestDist / resultSets.length
         val info = testCase.getInfo
@@ -145,10 +172,15 @@ object Tester extends App {
         avgClosestDist = 0
 
       }
+      // Write HTML
+      htmlGen.outPut("data/test.html")
+
+
       Out.writeToFile(outPath, outPutSets)
       println("Test Finished.")
 
     }
+    case None => //"nothing"
   }
 
   def loadKNNStructure(file:File): mutable.HashMap[Int, Array[(Int, Double)]] = {

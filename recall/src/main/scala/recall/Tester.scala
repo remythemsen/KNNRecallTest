@@ -2,74 +2,23 @@ package recall
 
 import java.io._
 
-import io.Parser.{Parser, RawParserDouble, TestCasesParser}
-import io.Parser._
-import io._
+import io.Parser.{RawParserDouble, TestCasesParser}
+import io.ResultWriter
 import scopt.OptionParser
 import tools.DataPoint.NumericDataPoint
 import tools._
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
-
-/**
-  * Runs testcases, outputs results along with the
-  * recall difference from true KNN result.
-  *
-  * Params: testcases file path
-  *         knnstructure path
-  */
-
-case class Config(
-                   data:File = new File("."),
-                   n:Int = 0,
-                   k:Int = 30,
-                   queryPoints:File = new File("."),
-                   knnstructure:File = new File("."),
-                   measure:String = ".",
-                   testCases:File = new File("."),
-                   outDir:String = "."
-                 )
 
 object Tester extends App {
 
-  val parser = new OptionParser[Config]("Reducer") {
-    head("Reducer", "1.0")
-
-    opt[File]('d', "data").required().valueName("<file>").action((x, c) =>
-      c.copy(data = x)).text("input data file!")
-
-    opt[Int]('n', "size").required().valueName("<int>").action((x, c) =>
-      c.copy(n = x)).text("input data file size")
-
-    opt[Int]('k', "knn").required().valueName("<int>").action((x, c) =>
-      c.copy(k = x)).text("input data file size")
-
-    opt[File]('q', "querypoints").required().valueName("<file>").action((x, c) =>
-      c.copy(queryPoints = x)).text("optimal dataset query points")
-
-    opt[File]('s', "knnstructure").required().valueName("<file>").action((x, c) =>
-      c.copy(knnstructure = x)).text("optimal knn structure file")
-
-    opt[String]('m', "measure").valueName("<string>").required().action((x, c) =>
-      c.copy(measure = x)).text("measure chosen for optimal set generation")
-
-    opt[File]('t', "testcases").valueName("<File>").required().action((x, c) =>
-      c.copy(testCases = x)).text("test cases file")
-
-    opt[String]('o', "out").valueName("<string>").required().action((x, c) =>
-      c.copy(outDir = x)).text("out file directory (without trailing slash")
-
-    help("help").text("prints this usage text")
-  }
-
   var tknn: mutable.HashMap[Int, Array[(Int, Double)]] = _
 
-  parser.parse(args, Config()) match {
+  getArgsParser.parse(args, Config()) match {
     case Some(config) => {
 
-      // TODO Get input params:
+
       // Optimal Setup
       val data = config.data //"data/descriptors-1-million.data"
       val queries = config.queryPoints //"data/queries-1m-raw.data"
@@ -81,6 +30,21 @@ object Tester extends App {
       }
       val N = config.n
       val outPath = config.outDir + "/results.txt"
+
+
+      val eps = Array(0.01, 0.05, 0.1, 0.2)
+      val resWriter = new ResultWriter("out", "recallv2", {
+        val sb = new StringBuilder
+        sb.append("[ Dimensions ]\t")
+        sb.append("[ Measure ]\t")
+        sb.append("[ N ]\t")
+        sb.append("[ K ]\t")
+        sb.append("[ Binary ]\t")
+        for(v <- eps) {
+          sb.append("[ eps: "+v+" ]\t")
+        }
+        sb.toString
+      })
 
       println("Preparing KNN Recall Test...")
       println("Loading True KNN Structure...")
@@ -96,91 +60,56 @@ object Tester extends App {
       }
 
       println("Loading TestCases...")
-      val parser = new TestCasesParser(Source.fromFile(config.testCases).getLines())
-      var testCases = new ArrayBuffer[TestCase[(Int, Array[Double])]]()
-      while (parser.hasNext) {
-        testCases += parser.getTestCase
-      }
+      // Get testcases
+      val tcp = new TestCasesParser(Source.fromFile(config.testCases).getLines)
 
+      // Run through each
+      while(tcp.hasNext) {
+        // result for testcase
+        val recalls = new Array[Double](eps.length)
 
-      println("Starting Recall Test...")
-      val htmlGen = new HTMLGenerator(new StringBuilder)
-      val outPutSets: ArrayBuffer[(String, String, String, String, String, Double, Double, Double)] = new ArrayBuffer()
+        val tc = tcp.getTestCase
+        val tcr = tc.run
+        for(qRes <- tcr) {
+          val qp = qRes._1.get._1
 
-      // Optimal resutls to be printed
-      val pResults:ArrayBuffer[(Int, Array[(Int,Double)])] = new ArrayBuffer[(Int, Array[(Int,Double)])]()
-      for (v <- this.tknn.iterator) {
-        pResults += Tuple2(v._1,v._2)
-      }
+          // Get p_k (k'th point dist from q)
+          val optKnn = this.tknn.get(qp).get
+          val p_k = optKnn(tc.K-1) // Getting k'th item (assuming asc ordering)
 
-      // Adding optimal res html section
-      htmlGen.addSection(Tuple2("Optimal: (Euclidean, 4096 dimensions)", pResults))
-
-
-
-      for (testCase <- testCases) {
-        // Progress test 1 out of 4
-        val resultSets = testCase.run
-
-        // Recall is the average over jaccard sim on each q result
-
-        var avgClosestDist = 0.0
-        var averageRecall = 0.0
-        val optimalAvgClosestDist = {
-          var sum = 0.0
-          for (v <- this.tknn.valuesIterator) {
-            //Assuming that they are sorted
-            sum += v.head._2
-          }
-          sum / this.tknn.valuesIterator.length
-        }
-
-        val tcInfo = testCase.getInfo._4.toLowerCase + " " + testCase.getInfo._1 + " " + testCase.getInfo._5
-
-        val testCaseHtmlOutSection:(String, ArrayBuffer[(Int, Array[(Int,Double)])]) = (tcInfo, new ArrayBuffer[(Int, Array[(Int,Double)])]())
-
-        for (resultSet <- resultSets) { // Resultset represents a query to KNN, (that query's closest points)
-          // Insert set into resultset to be printed in html
-
-          val qp = resultSet._1.get._1
-          val sortedResSets = resultSet._2.sortBy(x => x._2)    //.map(y => y._1).map(z => z.get)
-          val closestTuples = sortedResSets.map(x => x._1.get._1).zip(sortedResSets.map(y => y._2))
-
-
-          testCaseHtmlOutSection._2 += Tuple2(qp, closestTuples)
-
-          avgClosestDist += {
-            resultSet._2.sortBy(x => x._2).head._2
-          }
-          averageRecall += {
-            val optimal: Array[(Int, Double)] = this.tknn.get(resultSet._1.get._1).get
-            val optSet = optimal.map(x => x._1)
-            val retrievedSet = resultSet._2.map(x => x._1.get._1)
-
-            Jaccard.measure(optSet, retrievedSet)
+          // Calc recall for each eps
+          for(i <- eps.indices) {
+            for(p <- qRes._2) {
+              // If p'_i < p_k * (1+eps) then add 1
+              if(p._2 < p_k._2*(1+eps(i))) recalls(i) = recalls(i) + 1
+            }
           }
         }
 
-        // Print to HTML
-        htmlGen.addSection(testCaseHtmlOutSection)
+        // Computing mean of recalls
+        for(i <- recalls.indices) {
+          recalls(i) = recalls(i) / tcr.length.toDouble // # of qp's
+        }
 
-        val result = averageRecall / resultSets.length
-        avgClosestDist = avgClosestDist / resultSets.length
-        val info = testCase.getInfo
-
-        outPutSets += Tuple8(info._1, info._2, info._3, info._4, info._5, result, optimalAvgClosestDist, avgClosestDist)
-        avgClosestDist = 0
+        // Write result as line to file
+        // [Dim] [Measure] N K Bin [Eps1] [Eps2] [Epsi]
+        resWriter.writeResult({
+          val sb = new StringBuilder
+          sb.append(tc.dimensions.toString+"\t")
+          sb.append(tc.distance.getClass.getSimpleName+"\t")
+          sb.append(tc.dataSetSize+"\t")
+          sb.append(tc.K.toString+"\t")
+          for(recall <- recalls) {
+            sb.append(recall+"\t")
+          }
+          sb.toString
+        })
 
       }
-      // Write HTML
-      htmlGen.outPut("data/test.html")
 
-
-      Out.writeToFile(outPath, outPutSets)
-      println("Test Finished.")
 
     }
-    case None => //"nothing"
+    case None => // Nothing
   }
 
   def loadKNNStructure(file:File): mutable.HashMap[Int, Array[(Int, Double)]] = {
@@ -208,5 +137,37 @@ object Tester extends App {
     println("structure was saved..")
 
     structure
+  }
+
+  def getArgsParser : OptionParser[Config] = {
+    new OptionParser[Config]("Reducer") {
+      head("Reducer", "1.0")
+
+      opt[File]('d', "data").required().valueName("<file>").action((x, c) =>
+        c.copy(data = x)).text("input data file!")
+
+      opt[Int]('n', "size").required().valueName("<int>").action((x, c) =>
+        c.copy(n = x)).text("input data file size")
+
+      opt[Int]('k', "knn").required().valueName("<int>").action((x, c) =>
+        c.copy(k = x)).text("input data file size")
+
+      opt[File]('q', "querypoints").required().valueName("<file>").action((x, c) =>
+        c.copy(queryPoints = x)).text("optimal dataset query points")
+
+      opt[File]('s', "knnstructure").required().valueName("<file>").action((x, c) =>
+        c.copy(knnstructure = x)).text("optimal knn structure file")
+
+      opt[String]('m', "measure").valueName("<string>").required().action((x, c) =>
+        c.copy(measure = x)).text("measure chosen for optimal set generation")
+
+      opt[File]('t', "testcases").valueName("<File>").required().action((x, c) =>
+        c.copy(testCases = x)).text("test cases file")
+
+      opt[String]('o', "out").valueName("<string>").required().action((x, c) =>
+        c.copy(outDir = x)).text("out file directory (without trailing slash")
+
+      help("help").text("prints this usage text")
+    }
   }
 }

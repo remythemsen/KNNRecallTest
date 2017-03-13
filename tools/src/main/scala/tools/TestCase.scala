@@ -9,7 +9,7 @@ import tools.DataPoint.NumericDataPoint
   * @param data
   */
 
-class TestCase[A](fileName:String, distance:Distance, data:Parser[NumericDataPoint[A]], queries:Parser[NumericDataPoint[A]], K:Int, dataSetSize:Int, querySetSize:Int, dimensions:Int) { // TODO Extends Runnable
+case class TestCase[A](fileName:String, distance:Distance, data:Parser[NumericDataPoint[A]], queries:Parser[NumericDataPoint[A]], K:Int, dataSetSize:Int, querySetSize:Int, dimensions:Int) { // TODO Extends Runnable
   def getInfo = {
     (fileName, data.getClass.getSimpleName, distance.getClass.getSimpleName, K.toString, dataSetSize.toString, querySetSize.toString, dimensions.toString)
   }

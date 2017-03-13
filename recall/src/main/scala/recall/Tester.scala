@@ -9,6 +9,7 @@ import tools.DataPoint.NumericDataPoint
 import tools._
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 object Tester extends App {
@@ -67,28 +68,41 @@ object Tester extends App {
       while(tcp.hasNext) {
         // result for testcase
         val recalls = new Array[Double](eps.length)
-
         val tc = tcp.getTestCase
-        val tcr = tc.run
-        for(qRes <- tcr) {
-          val qp = qRes._1.get._1
+        val tcResultSets = tc.run
+
+        // Build map of non reduced vecs
+        println("Building Map of Org Vectors...")
+        val ogSetParser = new RawParserDouble(Source.fromFile(config.data).getLines)
+        val tcResultSetsOrgVecsMap = buildOrgVecMap(tcResultSets, ogSetParser)
+        println("Done... ")
+        println("Running Recall for each query... ")
+
+        // for each query, get recall
+        for(qRes <- tcResultSets) {
 
           // Get p_k (k'th point dist from q)
-          val optKnn = this.tknn.get(qp).get
+          val qpId:Int = qRes._1.get._1
+          val optKnn = this.tknn.get(qpId).get
           val p_k = optKnn(tc.K-1) // Getting k'th item (assuming asc ordering)
+
+          val org_q_vec = tcResultSetsOrgVecsMap(qpId)
 
           // Calc recall for each eps
           for(i <- eps.indices) {
+            // Testing real distance of each found near neighbor
             for(p <- qRes._2) {
+              val org_p_vec = tcResultSetsOrgVecsMap(p._1.get._1)
+
               // If p'_i < p_k * (1+eps) then add 1
-              if(p._2 < p_k._2*(1+eps(i))) recalls(i) = recalls(i) + 1
+              if(measure.measure(org_q_vec, org_p_vec) < (p_k._2 * (1+eps(i)))) recalls(i) = recalls(i) + 1
             }
           }
         }
 
         // Computing mean of recalls
         for(i <- recalls.indices) {
-          recalls(i) = recalls(i) / tcr.length.toDouble // # of qp's
+          recalls(i) = recalls(i) / tcResultSets.length.toDouble // # of qp's
         }
 
         // Write result as line to file
@@ -110,6 +124,33 @@ object Tester extends App {
 
     }
     case None => // Nothing
+  }
+
+
+  def buildOrgVecMap(queries: ArrayBuffer[(NumericDataPoint[(Int, Array[Double])], Array[(NumericDataPoint[(Int, Array[Double])], Double)])], parser:RawParserDouble) : mutable.HashMap[Int, Array[Double]] = {
+    val map = new mutable.HashMap[Int, Array[Double]]()
+
+    // Convert input to just list of ints
+    val ids = new ArrayBuffer[Int]
+    for(q <- queries) {
+      // Adding qp id
+      ids += q._1.get._1
+      for(p <- q._2) {
+        // Adding res p's id's
+        ids += p._1.get._1
+      }
+    }
+    val distinctIds:ArrayBuffer[Int] = ids.distinct
+
+    // Traverse dataset finding needed vectors
+    while(parser.hasNext) {
+      val t = parser.next
+
+      if(distinctIds.contains(t.head.get._1)) {
+        map += (t.head.get._1 -> t.head.get._2)
+      }
+    }
+    map
   }
 
   def loadKNNStructure(file:File): mutable.HashMap[Int, Array[(Int, Double)]] = {

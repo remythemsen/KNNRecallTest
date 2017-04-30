@@ -18,20 +18,21 @@ object Program extends App {
     case Some(config) => {
       val data = config.data
       val qps = config.queries
-      val parser = new ReducedParserDouble(Source.fromFile(data).getLines)
+      val parser = Source.fromFile(data).getLines
       val qpparser = new RawParserDouble(Source.fromFile(qps).getLines())
       var qp = qpparser.next.get.get
       val output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(config.outFile +"/"+ data.getName().substring(0, data.getName.length - 5) + ".queries")))
 
       while (parser.hasNext) {
-        val tuple = parser.next.get.get
+        val line = parser.next.split(" ")
         val sb = new StringBuilder
-        if (tuple._1 == qp._1) {
+        if (line.head.toInt == qp._1) {
           // Write to file
-          sb.append(tuple._1)
+          sb.append(line.head)
           var i = 0
-          while (i < tuple._2.length) {
-            sb.append(" " + tuple._2(i))
+          val rest = line.tail
+          while (i < rest.length) {
+            sb.append(" " + rest(i))
             i += 1
           }
           sb.append("\n")

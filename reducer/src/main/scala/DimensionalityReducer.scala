@@ -26,17 +26,19 @@ object DimensionalityReducer{
     }
   }
 
-  def getRandMatrix(targetDimensions:Int, originalDimensions:Int, rnd:Gaussian): Array[Array[Double]] ={
+  def getRandMatrix(targetDimensions:Int, originalDimensions:Int, seed:Long): Array[Array[Double]] ={
     val randomMatrix = for {
       i <- (0 until targetDimensions).toArray
       b <- Array(new Array[Double](originalDimensions))
     } yield b
 
+    val rnd = new Random(seed)
+
     // Populate bMatrix
     for (i <- 0 until targetDimensions) {
       for (j <- 0 until originalDimensions) {
         // dimenstions in each Vector
-        randomMatrix(i)(j) = rnd.sample
+        randomMatrix(i)(j) = rnd.nextGaussian()
       }
     }
     //val M=normalizeMatrix(randomMatrix)

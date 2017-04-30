@@ -1,6 +1,6 @@
 import java.io._
 
-import io.Parser.RawParserDouble
+import io.Parser.{RawParserDouble, ReducedParserDouble, ReducedParserFloat}
 import scopt.OptionParser
 import tools.DataPoint.NumericDataPoint
 import tools._
@@ -21,11 +21,11 @@ object Program extends App {
         case "euclidean" => Euclidean
       }
 
-      for(i <- 0 until 10) {
+      for(i <- 0 until 1) {
         println("building structure "+(i+1)+" out of 10")
-        val knnSName = "data/"+i+"/structure-"+config.measure
+        val knnSName = "data/"+i+"/optimal-"+config.measure+".txt"
         val qpfile = "data/"+i+"/queries.txt"
-        buildKNNStructure(new File(knnSName), new RawParserDouble(Source.fromFile(config.data).getLines()), new RawParserDouble(Source.fromFile(new File(qpfile)).getLines()), config.k, measure, config.n)
+        buildKNNStructure(new File(knnSName), new ReducedParserDouble(Source.fromFile(config.data).getLines()), new ReducedParserDouble(Source.fromFile(new File(qpfile)).getLines()), config.k, measure, config.n)
       }
 
     }
@@ -33,7 +33,7 @@ object Program extends App {
   }
 
 
-  def buildKNNStructure(file:File, optData: RawParserDouble, queries: RawParserDouble, K: Int, measure: Distance, N: Int): mutable.HashMap[Int, Array[(Int, Double)]] = {
+  def buildKNNStructure(file:File, optData: ReducedParserDouble, queries: ReducedParserDouble, K: Int, measure: Distance, N: Int): mutable.HashMap[Int, Array[(Int, Double)]] = {
     type NumericTuple = NumericDataPoint[(Int, Double)]
     val structure = new mutable.HashMap[Int, Array[(Int, Double)]]
     val resultSets = KNN.search(optData, queries, K, measure, N)
@@ -44,12 +44,34 @@ object Program extends App {
     }
 
     println("Saving structure to disk...")
-    val oos = new ObjectOutputStream(new FileOutputStream(file))
-    oos.writeObject(structure)
-    oos.close
+    write(file, structure)
     println("structure was saved..")
 
     structure
+  }
+
+
+  def write(file:File, map:mutable.HashMap[Int, Array[(Int, Double)]]): Unit = {
+    val arr:Array[(Int, Array[(Int, Double)])] = map.toArray
+    for(i <- 0 until arr.length) {
+      val res:String = {
+        arr(i)._1.toString + {
+          val sb = new StringBuilder
+          for(x <- arr(i)._2) {
+            sb.append("," + x._1.toString + " " + x._2.toString)
+          }
+          sb.toString
+        }
+      }
+      writeResult(res)
+    }
+
+
+    def writeResult(line:String) : Unit = {
+      val bw = new BufferedWriter(new FileWriter(file,true))
+      bw.append(line+"\n")
+      bw.close()
+    }
   }
 
   def getArgsParser : OptionParser[Config] = {

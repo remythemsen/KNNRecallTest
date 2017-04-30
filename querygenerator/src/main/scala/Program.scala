@@ -15,10 +15,10 @@ object Program extends App {
     case Some(config) => {
 
       val trandom = new Random(config.seed)
-      for(i <- 0 until 10) {
 
         val input = Source.fromFile(config.data).getLines
-        val qpOutPut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(config.outFile+"/"+i+"/queries.txt")))
+        val dataFileName = config.data.getName
+        val qpOutPut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(config.outFile+"/"+dataFileName.substring(0, dataFileName.length-5) + ".queries")))
         val seed:Long = config.seed // use once, generated from random.org
         val rnd = new Random(trandom.nextLong())
         val skipSize = config.skipSize
@@ -49,7 +49,7 @@ object Program extends App {
         qpOutPut.close()
         println(qs)
       }
-    }
+
     case None => // Nothing
   }
 
@@ -58,7 +58,7 @@ object Program extends App {
       head("KNNBuilder", "1.0")
 
       opt[File]('d', "data").required().valueName("<file>").action((x, c) =>
-        c.copy(data = x)).text("input data file!")
+        c.copy(data = x)).text("input data file ONLY TAKES RAW!!")
 
       opt[Int]('n', "size").required().valueName("<int>").action((x, c) =>
         c.copy(n = x)).text("input data file size")

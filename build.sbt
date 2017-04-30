@@ -25,6 +25,8 @@ lazy val recall = project in file("recall") dependsOn(tools)
 
 lazy val querygenerator = project in file("querygenerator") dependsOn(tools)
 
+lazy val findquerypoints = project in file("findquerypoints") dependsOn(tools)
+
 lazy val knnstructurebuilder = project in file("knnstructurebuilder") dependsOn(tools)
 
 lazy val legacyrecall = project in file("legacyrecall") dependsOn(tools)

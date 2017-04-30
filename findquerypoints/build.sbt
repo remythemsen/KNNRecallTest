@@ -1,4 +1,4 @@
-name := "querygenerator"
+name := "findquerypoints"
 
 organization := "dk.knnrecalltest"
 
@@ -27,9 +27,9 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
 
-version in Docker := "latest"
-
 resolvers += "typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+
+version in Docker := "latest"
 
 maintainer := "Remy Themsen <remt@itu.dk>"
 

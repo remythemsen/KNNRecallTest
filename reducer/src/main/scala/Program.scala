@@ -1,6 +1,5 @@
 import java.io.{BufferedWriter, File, FileOutputStream, OutputStreamWriter}
 import java.util.concurrent.{ArrayBlockingQueue, Executors}
-import breeze.stats.distributions.Gaussian
 import io.Parser.RawParserDouble
 import scopt.OptionParser
 import scala.collection.mutable
@@ -62,14 +61,14 @@ object Program extends App {
 
       val dimensions = config.targetDim
       val sqrtTargetDim = Math.sqrt(dimensions.toDouble)
-      val queryPoints = Source.fromFile(config.queryPoints).getLines
+      val queryPoints = RawParserDouble(Source.fromFile(config.queryPoints).getLines)
       val qpMap = mutable.HashMap[Int, Boolean]()
       while (queryPoints.hasNext) {
-        qpMap += (queryPoints.next.toInt -> true)
+        qpMap += (queryPoints.next.get.get._1 -> true)
       }
 
       // TODO Find replacement of random
-      val rnd = new Gaussian(0, 1)
+      val rnd = new Random(config.randomSeed)
 
 
       val p = 4
@@ -84,8 +83,8 @@ object Program extends App {
 
       println("Generating Random Matrix...")
 
-      val randomMatrix = DimensionalityReducer.getRandMatrix(dimensions, originalDimensions, rnd)
-      val random = new Random(config.randomSeed) // TODO Better random
+      val randomMatrix = DimensionalityReducer.getRandMatrix(dimensions, originalDimensions, rnd.nextLong)
+      val random = new Random(config.randomSeed)
 
       val binary = config.binary
       var progress = 0

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaSbtSettings">
+    <option name="linkedExternalProjectsSettings">
+      <SbtProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/dataanalyzer" />
+            <option value="$PROJECT_DIR$/dataanalyzer/project" />
+            <option value="$PROJECT_DIR$/findquerypoints" />
+            <option value="$PROJECT_DIR$/findquerypoints/project" />
+            <option value="$PROJECT_DIR$/knnstructurebuilder" />
+            <option value="$PROJECT_DIR$/knnstructurebuilder/project" />
+            <option value="$PROJECT_DIR$/legacyrecall" />
+            <option value="$PROJECT_DIR$/legacyrecall/project" />
+            <option value="$PROJECT_DIR$/project" />
+            <option value="$PROJECT_DIR$/querygenerator" />
+            <option value="$PROJECT_DIR$/querygenerator/project" />
+            <option value="$PROJECT_DIR$/recall" />
+            <option value="$PROJECT_DIR$/recall/project" />
+            <option value="$PROJECT_DIR$/reducer" />
+            <option value="$PROJECT_DIR$/reducer/project" />
+            <option value="$PROJECT_DIR$/tools" />
+            <option value="$PROJECT_DIR$/tools/project" />
+          </set>
+        </option>
+        <option name="sbtVersion" value="0.13.13" />
+        <option name="useAutoImport" value="true" />
+        <option name="useOurOwnAutoImport" value="true" />
+      </SbtProjectSettings>
+    </option>
+  </component>
+</project>

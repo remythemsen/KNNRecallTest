@@ -9,6 +9,7 @@ case class Config(
                    knnstructure:File = new File("."),
                    measure:String = ".",
                    testCases:File = new File("."),
+                   dataFormat:String = "raw",
                    outDir:String = "."
                  )
 

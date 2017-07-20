@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/KNNRecallTest.iml" filepath="$PROJECT_DIR$/.idea/KNNRecallTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/KNNRecallTest-build.iml" filepath="$PROJECT_DIR$/.idea/modules/KNNRecallTest-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dataanalyzer.iml" filepath="$PROJECT_DIR$/.idea/modules/dataanalyzer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/dataanalyzer-build.iml" filepath="$PROJECT_DIR$/.idea/modules/dataanalyzer-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/findquerypoints.iml" filepath="$PROJECT_DIR$/.idea/modules/findquerypoints.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/findquerypoints-build.iml" filepath="$PROJECT_DIR$/.idea/modules/findquerypoints-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/knnstructurebuilder.iml" filepath="$PROJECT_DIR$/.idea/modules/knnstructurebuilder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/knnstructurebuilder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/knnstructurebuilder-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/legacyrecall.iml" filepath="$PROJECT_DIR$/.idea/modules/legacyrecall.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/legacyrecall-build.iml" filepath="$PROJECT_DIR$/.idea/modules/legacyrecall-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/querygenerator.iml" filepath="$PROJECT_DIR$/.idea/modules/querygenerator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/querygenerator-build.iml" filepath="$PROJECT_DIR$/.idea/modules/querygenerator-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/recall.iml" filepath="$PROJECT_DIR$/.idea/modules/recall.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/recall-build.iml" filepath="$PROJECT_DIR$/.idea/modules/recall-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/reducer.iml" filepath="$PROJECT_DIR$/.idea/modules/reducer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/reducer-build.iml" filepath="$PROJECT_DIR$/.idea/modules/reducer-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools.iml" filepath="$PROJECT_DIR$/.idea/modules/tools.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tools-build.iml" filepath="$PROJECT_DIR$/.idea/modules/tools-build.iml" />
+    </modules>
+  </component>
+</project>

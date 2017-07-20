@@ -15,7 +15,11 @@ trait Distance {
 
 object Euclidean extends Distance {
   override def measure(x: Array[Double], y: Array[Double]): Double = {
-    require(x.length.equals(y.length))
+    if (x.length != y.length) {
+      println("WAS NOT EQUAL LENGTH")
+      println(x.length + "vs " + y.length)
+    }
+    //require(x.length.equals(y.length))
     Math.sqrt((x zip y).map {
       case (a, b) => Math.pow(b - a, 2)
     }.sum)

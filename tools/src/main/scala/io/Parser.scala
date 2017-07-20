@@ -77,8 +77,8 @@ object Parser {
     override def getTuple = ???
     def getTestCase = {
       val config = iterator.next.split(" ")
-      val data = Source.fromFile(new File(config(0))).getLines()
-      val queries = Source.fromFile(new File(config(1))).getLines()
+      val data = Source.fromFile(new File(config(0))).getLines() // the reduced dataset
+      val queries = Source.fromFile(new File(config(1))).getLines() // a set of queries in the
       val dataFormat = config(2)
       val knnStructDir = config(3)
       val K = config(4).toInt
@@ -94,8 +94,8 @@ object Parser {
 
       // new Testcase
       val tc = dataFormat match {
-        case "raw" => numType match {
-          case "Double" => {
+        case "raw" => numType.toLowerCase match {
+          case "double" => {
             new TestCase[(Int, Array[Double])](
               config(0),
               measure,
@@ -108,8 +108,8 @@ object Parser {
             )
           }
         }
-        case "reduced" => numType match {
-          case "Double" => {
+        case "reduced" => numType.toLowerCase match {
+          case "double" => {
             new TestCase[(Int, Array[Double])](
               config(0),
               measure,

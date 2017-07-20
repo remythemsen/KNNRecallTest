@@ -2,7 +2,7 @@ package recall
 
 import java.io._
 
-import io.Parser.{RawParserDouble, TestCasesParser}
+import io.Parser.{Parser, RawParserDouble, ReducedParserDouble, TestCasesParser}
 import io.ResultWriter
 import scopt.OptionParser
 import tools.DataPoint.NumericDataPoint
@@ -34,7 +34,7 @@ object Tester extends App {
 
 
       val eps = Array(0.01, 0.05, 0.1, 0.2)
-      val resWriter = new ResultWriter("out", "recallv2", {
+      val resWriter = new ResultWriter(config.outDir, "recallv2", {
         val sb = new StringBuilder
         sb.append("[ Dimensions ]\t")
         sb.append("[ Measure ]\t")
@@ -56,7 +56,11 @@ object Tester extends App {
           println(e)
           println("No usable optimal result structure was found!")
           // With side effect of saving the new structure to disk
-          tknn = buildKNNStructure(config.knnstructure, new RawParserDouble(Source.fromFile(config.data).getLines()), new RawParserDouble(Source.fromFile(config.queryPoints).getLines()), K, measure, N)
+          tknn = if(config.dataFormat == "raw") {
+            buildKNNStructure(config.knnstructure, new RawParserDouble(Source.fromFile(config.data).getLines()), new RawParserDouble(Source.fromFile(config.queryPoints).getLines()), K, measure, N)
+          } else {
+            buildKNNStructure(config.knnstructure, new ReducedParserDouble(Source.fromFile(config.data).getLines()), new ReducedParserDouble(Source.fromFile(config.queryPoints).getLines()), K, measure, N)
+          }
         }
       }
 
@@ -73,7 +77,11 @@ object Tester extends App {
 
         // Build map of non reduced vecs
         println("Building Map of Org Vectors...")
-        val ogSetParser = new RawParserDouble(Source.fromFile(config.data).getLines)
+        val ogSetParser = if(config.dataFormat == "raw") {
+          new RawParserDouble(Source.fromFile(config.data).getLines)
+        } else {
+          new ReducedParserDouble(Source.fromFile(config.data).getLines)
+        }
         val tcResultSetsOrgVecsMap = buildOrgVecMap(tcResultSets, ogSetParser)
         println("Done... ")
         println("Running Recall for each query... ")
@@ -127,7 +135,7 @@ object Tester extends App {
   }
 
 
-  def buildOrgVecMap(queries: ArrayBuffer[(NumericDataPoint[(Int, Array[Double])], Array[(NumericDataPoint[(Int, Array[Double])], Double)])], parser:RawParserDouble) : mutable.HashMap[Int, Array[Double]] = {
+  def buildOrgVecMap(queries: ArrayBuffer[(NumericDataPoint[(Int, Array[Double])], Array[(NumericDataPoint[(Int, Array[Double])], Double)])], parser:Parser[NumericDataPoint[(Int, Array[Double])]]) : mutable.HashMap[Int, Array[Double]] = {
     val map = new mutable.HashMap[Int, Array[Double]]()
 
     // Convert input to just list of ints
@@ -161,7 +169,8 @@ object Tester extends App {
     hashMap
   }
 
-  def buildKNNStructure(file:File, optData: RawParserDouble, queries: RawParserDouble, K: Int, measure: Distance, N: Int): mutable.HashMap[Int, Array[(Int, Double)]] = {
+  def buildKNNStructure(file:File, optData: Parser[NumericDataPoint[(Int, Array[Double])]], queries: Parser[NumericDataPoint[(Int, Array[Double])]], K: Int, measure: Distance, N: Int): mutable.HashMap[Int, Array[(Int, Double)]] = {
+
     type NumericTuple = NumericDataPoint[(Int, Double)]
     val structure = new mutable.HashMap[Int, Array[(Int, Double)]]
     val resultSets = KNN.search(optData, queries, K, measure, N)
@@ -191,13 +200,13 @@ object Tester extends App {
         c.copy(n = x)).text("input data file size")
 
       opt[Int]('k', "knn").required().valueName("<int>").action((x, c) =>
-        c.copy(k = x)).text("input data file size")
+        c.copy(k = x)).text("K Neighbors to be found for each query")
 
       opt[File]('q', "querypoints").required().valueName("<file>").action((x, c) =>
-        c.copy(queryPoints = x)).text("optimal dataset query points")
+        c.copy(queryPoints = x)).text("querypoints used to build optimal sets")
 
       opt[File]('s', "knnstructure").required().valueName("<file>").action((x, c) =>
-        c.copy(knnstructure = x)).text("optimal knn structure file")
+        c.copy(knnstructure = x)).text("optimal knn structure file(if you dont have one, just enter the name of a new one which will be created")
 
       opt[String]('m', "measure").valueName("<string>").required().action((x, c) =>
         c.copy(measure = x)).text("measure chosen for optimal set generation")
@@ -207,6 +216,9 @@ object Tester extends App {
 
       opt[String]('o', "out").valueName("<string>").required().action((x, c) =>
         c.copy(outDir = x)).text("out file directory (without trailing slash")
+
+      opt[String]('f', "dataFormat").valueName("<string>").required().action((x, c) =>
+        c.copy(dataFormat = x)).text("the format in which the input (non reduced data is in) (both queries and data) raw|reduced")
 
       help("help").text("prints this usage text")
     }

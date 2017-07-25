@@ -9,7 +9,7 @@ object Program extends App {
   val newLine = System.getProperty("line.separator");
 
   var t = dataParser.next()
-  for(i <- 0 until 9) {
+  for(i <- 0 until args(3).toInt) {
     if(t.split(" ")(0).toInt == i) {
       writer.write(t+newLine)
       if(dataParser.hasNext)

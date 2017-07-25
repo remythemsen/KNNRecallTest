@@ -32,3 +32,5 @@ lazy val knnstructurebuilder = project in file("knnstructurebuilder") dependsOn(
 lazy val legacyrecall = project in file("legacyrecall") dependsOn(tools)
 
 lazy val dataanalyzer = project in file("dataanalyzer") dependsOn(tools)
+
+lazy val combiner = project in file("combiner") dependsOn(tools)

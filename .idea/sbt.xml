@@ -7,6 +7,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/combiner" />
+            <option value="$PROJECT_DIR$/combiner/project" />
             <option value="$PROJECT_DIR$/dataanalyzer" />
             <option value="$PROJECT_DIR$/dataanalyzer/project" />
             <option value="$PROJECT_DIR$/findquerypoints" />

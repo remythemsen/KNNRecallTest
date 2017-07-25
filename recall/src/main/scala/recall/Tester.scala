@@ -1,13 +1,11 @@
 package recall
 
 import java.io._
-
 import io.Parser.{Parser, RawParserDouble, ReducedParserDouble, TestCasesParser}
 import io.ResultWriter
 import scopt.OptionParser
 import tools.DataPoint.NumericDataPoint
 import tools._
-
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
@@ -174,7 +172,6 @@ object Tester extends App {
     type NumericTuple = NumericDataPoint[(Int, Double)]
     val structure = new mutable.HashMap[Int, Array[(Int, Double)]]
     val resultSets = KNN.search(optData, queries, K, measure, N)
-
 
     for (rSet <- resultSets) {
       structure += (rSet._1.get._1 -> rSet._2.sortBy(x => x._2).map(x => (x._1.get._1, x._2)))

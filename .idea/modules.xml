@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/KNNRecallTest.iml" filepath="$PROJECT_DIR$/.idea/KNNRecallTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/KNNRecallTest-build.iml" filepath="$PROJECT_DIR$/.idea/modules/KNNRecallTest-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/combiner/combiner.iml" filepath="$PROJECT_DIR$/combiner/combiner.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/combiner-build.iml" filepath="$PROJECT_DIR$/.idea/modules/combiner-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dataanalyzer.iml" filepath="$PROJECT_DIR$/.idea/modules/dataanalyzer.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dataanalyzer-build.iml" filepath="$PROJECT_DIR$/.idea/modules/dataanalyzer-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/findquerypoints.iml" filepath="$PROJECT_DIR$/.idea/modules/findquerypoints.iml" />

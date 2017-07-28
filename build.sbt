@@ -15,6 +15,14 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
 
+
+fork := true
+
+javaOptions in recall := Seq(
+  "-Xmx10g",
+  "-Xms10g"
+)
+
 lazy val KNNRecallTest = project in file(".") dependsOn(tools)
 
 lazy val tools = project in file("tools")

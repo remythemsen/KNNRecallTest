@@ -10,6 +10,8 @@ homepage := Some(url("https://github.com/remythemsen/KNNRecallTest"))
 
 startYear := Some(2017)
 
+fork := true
+
 scmInfo := Some(
   ScmInfo(
     url("https://github.com/remythemsen/KNNRecallTest"),
@@ -26,6 +28,7 @@ libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "3.0.0",
   "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
+
 
 resolvers += "typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 

@@ -10,6 +10,7 @@
 [debug] dependency descriptor has been mediated: dependency: org.scala-lang#scala-reflect;2.11.8 {compile=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime=[compile, runtime(*), master(compile), runtime, compile(*), master], test=[compile, runtime(*), master(compile), runtime, compile(*), master], compile-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], test-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], scala-tool=[compile, runtime(*), master(compile), runtime, compile(*), master]} => dependency: org.scala-lang#scala-reflect;2.11.8 {compile=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime=[compile, runtime(*), master(compile), runtime, compile(*), master], test=[compile, runtime(*), master(compile), runtime, compile(*), master], compile-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], runtime-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], test-internal=[compile, runtime(*), master(compile), runtime, compile(*), master], scala-tool=[compile, runtime(*), master(compile), runtime, compile(*), master]}
 [info] Resolving org.scala-lang#scala-library;2.11.8 ...
 [debug] sbt-chain: Checking cache for: dependency: org.scala-lang#scala-library;2.11.8 {compile=[default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master], runtime=[default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master], test=[default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master], compile-internal=[default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master], runtime-internal=[default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master], test-internal=[default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master], scala-tool=[default, compile, runtime(*), master(compile), runtime, optional, optional(default), compile(*), master]}
+[debug] no default cache defined: set to /home/remeeh/.ivy2/cache
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-library;2.11.8
 [debug] 	found org.scala-lang#scala-library;2.11.8 in sbt-chain
 [debug] 	[2.11.8] org.scala-lang#scala-library;2.11.8
@@ -1063,7 +1064,7 @@
 [debug] 	[NOT REQUIRED] org.scala-lang#scala-compiler;2.11.8!scala-compiler.jar(src)
 [debug] 	[NOT REQUIRED] org.scala-lang.modules#scala-xml_2.11;1.0.4!scala-xml_2.11.jar(src)
 [debug] 	[NOT REQUIRED] jline#jline;2.12.1!jline.jar(src)
-[debug] :: resolution report :: resolve 130ms :: artifacts dl 4ms
+[debug] :: resolution report :: resolve 208ms :: artifacts dl 5ms
 [debug] 	report for tools#tools$sources_2.11;1.0 compile produced in /home/remeeh/IdeaProjects/KNNRecallTest/tools/target/resolution-cache/reports/tools-tools$sources_2.11-compile.xml
 [debug] 	report for tools#tools$sources_2.11;1.0 runtime produced in /home/remeeh/IdeaProjects/KNNRecallTest/tools/target/resolution-cache/reports/tools-tools$sources_2.11-runtime.xml
 [debug] 	report for tools#tools$sources_2.11;1.0 test produced in /home/remeeh/IdeaProjects/KNNRecallTest/tools/target/resolution-cache/reports/tools-tools$sources_2.11-test.xml
@@ -1077,4 +1078,4 @@
 [debug] 	report for tools#tools$sources_2.11;1.0 docs produced in /home/remeeh/IdeaProjects/KNNRecallTest/tools/target/resolution-cache/reports/tools-tools$sources_2.11-docs.xml
 [debug] 	report for tools#tools$sources_2.11;1.0 pom produced in /home/remeeh/IdeaProjects/KNNRecallTest/tools/target/resolution-cache/reports/tools-tools$sources_2.11-pom.xml
 [debug] 	report for tools#tools$sources_2.11;1.0 scala-tool produced in /home/remeeh/IdeaProjects/KNNRecallTest/tools/target/resolution-cache/reports/tools-tools$sources_2.11-scala-tool.xml
-[debug] 	resolve done (130ms resolve - 4ms download)
+[debug] 	resolve done (208ms resolve - 5ms download)

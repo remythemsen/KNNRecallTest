@@ -76,16 +76,15 @@ object Tester extends App {
         val tcResultSets = tc.run
 
         // Build maps of non reduced vecs for correct distance comparison
-        println("Building Map of QP Vectors from original space...")
-        val orgQPMap = buildOrgSpaceMap({
+        println("Building Map of Vectors from original space...")
+        // this will only retrieve the vectors that's actually in the reduced knn set, and the queryset (to save space)
+        val orgVecMap = buildOrgVecMap(
+          tcResultSets,
+          if(config.dataFormat.toLowerCase() == "raw") new RawParserDouble(Source.fromFile(config.data).getLines())
+          else new ReducedParserDouble(Source.fromFile(config.data).getLines()),
           if(config.dataFormat.toLowerCase() == "raw") new RawParserDouble(Source.fromFile(config.queryPoints).getLines())
           else new ReducedParserDouble(Source.fromFile(config.queryPoints).getLines())
-        })
-        println("Building Map of Vectors from original space...")
-        val orgVecMap = buildOrgSpaceMap({
-          if(config.dataFormat.toLowerCase() == "raw") new RawParserDouble(Source.fromFile(config.data).getLines())
-          else new ReducedParserDouble(Source.fromFile(config.data).getLines())
-        })
+        )
 
         println("Done... ")
 
@@ -111,7 +110,7 @@ object Tester extends App {
           // Getting k'th item (assuming asc ordering)
           val p_k = optKnn(tc.K-1)
 
-          val org_q_vec = orgQPMap(qpId)
+          val org_q_vec = orgVecMap(qpId)
 
           // Calc recall for each eps
           for(i <- eps.indices) {
@@ -151,18 +150,7 @@ object Tester extends App {
     case None => // Nothing
   }
 
-
-  def buildOrgSpaceMap(parser:Parser[NumericDataPoint[(Int, Array[Double])]]) = {
-    val map = new mutable.HashMap[Int, Array[Double]]()
-    while(parser.hasNext) {
-      val t = parser.next
-      map += (t.get.get._1 -> t.get.get._2)
-    }
-
-    map
-  }
-
-  def buildOrgVecMap(queries: ArrayBuffer[(NumericDataPoint[(Int, Array[Double])], Array[(NumericDataPoint[(Int, Array[Double])], Double)])], parser:Parser[NumericDataPoint[(Int, Array[Double])]]) : mutable.HashMap[Int, Array[Double]] = {
+  def buildOrgVecMap(queries: ArrayBuffer[(NumericDataPoint[(Int, Array[Double])], Array[(NumericDataPoint[(Int, Array[Double])], Double)])], parser:Parser[NumericDataPoint[(Int, Array[Double])]], parserQ: Parser[NumericDataPoint[(Int, Array[Double])]]) : mutable.HashMap[Int, Array[Double]] = {
     val map = new mutable.HashMap[Int, Array[Double]]()
 
     // Convert input to just list of ints
@@ -184,6 +172,11 @@ object Tester extends App {
       if(distinctIds.contains(t.head.get._1)) {
         map += (t.head.get._1 -> t.head.get._2)
       }
+    }
+    // now also adding query points (in org space) to map
+    while(parserQ.hasNext) {
+      val t = parserQ.next
+      map += (t.get.get._1 -> t.get.get._2)
     }
     map
   }

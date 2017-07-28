@@ -13,6 +13,8 @@
             <option value="$PROJECT_DIR$/dataanalyzer/project" />
             <option value="$PROJECT_DIR$/findquerypoints" />
             <option value="$PROJECT_DIR$/findquerypoints/project" />
+            <option value="$PROJECT_DIR$/knnfilerenewer" />
+            <option value="$PROJECT_DIR$/knnfilerenewer/project" />
             <option value="$PROJECT_DIR$/knnstructurebuilder" />
             <option value="$PROJECT_DIR$/knnstructurebuilder/project" />
             <option value="$PROJECT_DIR$/legacyrecall" />

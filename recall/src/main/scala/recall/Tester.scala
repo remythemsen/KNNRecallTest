@@ -71,34 +71,53 @@ object Tester extends App {
         // result for testcase
         val recalls = new Array[Double](eps.length)
         val tc = tcp.getTestCase
+
+        // get k'nearest neighbours for each qp in qpfile specified in this testcase
         val tcResultSets = tc.run
 
-        // Build map of non reduced vecs
-        println("Building Map of Org Vectors...")
-        val ogSetParser = if(config.dataFormat == "raw") {
+        // Build maps of non reduced vecs for correct distance comparison
+        println("Building Map of QP Vectors from original space...")
+        val orgQPMap = buildOrgSpaceMap({
+          if(config.dataFormat.toLowerCase() == "raw") new RawParserDouble(Source.fromFile(config.queryPoints).getLines())
+          else new ReducedParserDouble(Source.fromFile(config.queryPoints).getLines())
+        })
+        println("Building Map of Vectors from original space...")
+        val orgVecMap = buildOrgSpaceMap({
+          if(config.dataFormat.toLowerCase() == "raw") new RawParserDouble(Source.fromFile(config.data).getLines())
+          else new ReducedParserDouble(Source.fromFile(config.data).getLines())
+        })
+
+        println("Done... ")
+
+
+/*        val ogSetParser = if(config.dataFormat == "raw") {
           new RawParserDouble(Source.fromFile(config.data).getLines)
         } else {
           new ReducedParserDouble(Source.fromFile(config.data).getLines)
-        }
-        val tcResultSetsOrgVecsMap = buildOrgVecMap(tcResultSets, ogSetParser)
-        println("Done... ")
-        println("Running Recall for each query... ")
+        }*/
+        //val tcResultSetsOrgVecsMap = buildOrgVecMap(tcResultSets, ogSetParser)
 
+
+        println("Running Recall for each query... ")
         // for each query, get recall
         for(qRes <- tcResultSets) {
 
           // Get p_k (k'th point dist from q)
           val qpId:Int = qRes._1.get._1
-          val optKnn = this.tknn.get(qpId).get
-          val p_k = optKnn(tc.K-1) // Getting k'th item (assuming asc ordering)
 
-          val org_q_vec = tcResultSetsOrgVecsMap(qpId)
+          // Getting the optimal set from knnstructuremap for qp 'q
+          val optKnn = this.tknn.get(qpId).get
+
+          // Getting k'th item (assuming asc ordering)
+          val p_k = optKnn(tc.K-1)
+
+          val org_q_vec = orgQPMap(qpId)
 
           // Calc recall for each eps
           for(i <- eps.indices) {
             // Testing real distance of each found near neighbor
             for(p <- qRes._2) {
-              val org_p_vec = tcResultSetsOrgVecsMap(p._1.get._1)
+              val org_p_vec = orgVecMap(p._1.get._1)
 
               // If p'_i < p_k * (1+eps) then add 1
               if(measure.measure(org_q_vec, org_p_vec) < (p_k._2 * (1+eps(i)))) recalls(i) = recalls(i) + 1
@@ -132,6 +151,16 @@ object Tester extends App {
     case None => // Nothing
   }
 
+
+  def buildOrgSpaceMap(parser:Parser[NumericDataPoint[(Int, Array[Double])]]) = {
+    val map = new mutable.HashMap[Int, Array[Double]]()
+    while(parser.hasNext) {
+      val t = parser.next
+      map += (t.get.get._1 -> t.get.get._2)
+    }
+
+    map
+  }
 
   def buildOrgVecMap(queries: ArrayBuffer[(NumericDataPoint[(Int, Array[Double])], Array[(NumericDataPoint[(Int, Array[Double])], Double)])], parser:Parser[NumericDataPoint[(Int, Array[Double])]]) : mutable.HashMap[Int, Array[Double]] = {
     val map = new mutable.HashMap[Int, Array[Double]]()

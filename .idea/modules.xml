@@ -10,6 +10,8 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dataanalyzer-build.iml" filepath="$PROJECT_DIR$/.idea/modules/dataanalyzer-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/findquerypoints.iml" filepath="$PROJECT_DIR$/.idea/modules/findquerypoints.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/findquerypoints-build.iml" filepath="$PROJECT_DIR$/.idea/modules/findquerypoints-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/knnfilerenewer/knnfilerenewer.iml" filepath="$PROJECT_DIR$/knnfilerenewer/knnfilerenewer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/knnfilerenewer-build.iml" filepath="$PROJECT_DIR$/.idea/modules/knnfilerenewer-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/knnstructurebuilder.iml" filepath="$PROJECT_DIR$/.idea/modules/knnstructurebuilder.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/knnstructurebuilder-build.iml" filepath="$PROJECT_DIR$/.idea/modules/knnstructurebuilder-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/legacyrecall.iml" filepath="$PROJECT_DIR$/.idea/modules/legacyrecall.iml" />

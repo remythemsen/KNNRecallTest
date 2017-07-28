@@ -10,8 +10,6 @@ homepage := Some(url("https://github.com/remythemsen/KNNRecallTest"))
 
 startYear := Some(2017)
 
-fork := true
-
 scmInfo := Some(
   ScmInfo(
     url("https://github.com/remythemsen/KNNRecallTest"),

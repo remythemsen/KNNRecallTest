@@ -16,12 +16,6 @@ libraryDependencies ++= Seq(
 )
 
 
-fork := true
-
-javaOptions in recall := Seq(
-  "-Xmx10g",
-  "-Xms10g"
-)
 
 lazy val KNNRecallTest = project in file(".") dependsOn(tools)
 
